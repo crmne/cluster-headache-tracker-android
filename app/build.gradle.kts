@@ -9,9 +9,9 @@ android {
 
     defaultConfig {
         applicationId = "me.paolino.clusterheadachetracker"
-        minSdk = 28
+        minSdk = 32
         targetSdk = 34
-        versionCode = 1
+        versionCode = 3
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -24,6 +24,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
