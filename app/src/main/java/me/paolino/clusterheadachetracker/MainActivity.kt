@@ -19,7 +19,7 @@ class MainActivity : HotwireActivity() {
             context = this,
             location = PathConfiguration.Location(
                 assetFilePath = "json/android_v1.json",
-                remoteFileUrl = "$BASE_URL/configurations/android_v1.json"
+//                remoteFileUrl = "$BASE_URL/configurations/android_v1.json"
             )
         )
     }
