@@ -11,7 +11,7 @@ android {
         applicationId = "me.paolino.clusterheadachetracker"
         minSdk = 28
         targetSdk = 34
-        versionCode = 5
+        versionCode = 6
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -42,8 +42,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    implementation("dev.hotwire:core:1.0.0")
-    implementation("dev.hotwire:navigation-fragments:1.0.0")
+    implementation("dev.hotwire:core:1.1.0")
+    implementation("dev.hotwire:navigation-fragments:1.1.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
