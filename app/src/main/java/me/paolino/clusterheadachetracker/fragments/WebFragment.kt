@@ -67,8 +67,12 @@ class WebFragment : HotwireWebFragment() {
     override fun onVisitCompleted(location: String, completedOffline: Boolean) {
         super.onVisitCompleted(location, completedOffline)
 
-        // Check if we just completed a visit from sign_in (indicating successful auth)
-        if (navigator.previousLocation?.contains("/sign_in") == true && !location.contains("/sign_in")) {
+        // Check if we just completed a successful authentication
+        // This happens when we navigate from sign_in to a main app page (not sign_up)
+        if (navigator.previousLocation?.contains("/sign_in") == true &&
+            !location.contains("/sign_in") &&
+            !location.contains("/sign_up")
+        ) {
             Log.d(TAG, "Authentication successful, sending authentication changed event")
             val intent = Intent(AuthEvents.AUTHENTICATION_CHANGED)
             LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
@@ -92,6 +96,7 @@ class WebFragment : HotwireWebFragment() {
     // They manage their own menu items through the bridge delegate
 
     private fun handleUnauthorizedError() {
+        Log.d(TAG, "Received 401 error, navigating to sign in")
         lifecycleScope.launch {
             // Navigate to sign in as a modal
             navigator.route(

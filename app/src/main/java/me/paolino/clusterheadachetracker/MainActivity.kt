@@ -6,6 +6,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
@@ -20,12 +22,15 @@ import me.paolino.clusterheadachetracker.util.AuthEvents
 import me.paolino.clusterheadachetracker.util.NEW_HEADACHE_LOG_URL
 import me.paolino.clusterheadachetracker.util.SIGN_IN_URL
 
+@Suppress("TooManyFunctions")
 class MainActivity : HotwireActivity() {
     private lateinit var bottomNavigationController: HotwireBottomNavigationController
 
     companion object {
         const val TAG = "MainActivity"
         const val NEW_TAB_INDEX = 2 // Index of the "New" tab
+        private const val SIGN_IN_MODAL_DELAY_MS = 500L
+        private const val SIGN_IN_NAVIGATION_DELAY_MS = 100L
     }
 
     private val activity: HotwireActivity
@@ -50,6 +55,19 @@ class MainActivity : HotwireActivity() {
         initializeBottomTabs()
         configureEdgeToEdge()
         registerReceivers()
+
+        // Check if we need to show sign in modal after recreation
+        if (intent.getBooleanExtra("show_sign_in", false)) {
+            Handler(Looper.getMainLooper()).postDelayed({
+                activity.delegate.currentNavigator?.route(
+                    location = SIGN_IN_URL,
+                    options = VisitOptions(),
+                    bundle = Bundle().apply {
+                        putString("presentation", "modal")
+                    },
+                )
+            }, SIGN_IN_MODAL_DELAY_MS)
+        }
     }
 
     override fun onDestroy() {
@@ -126,29 +144,54 @@ class MainActivity : HotwireActivity() {
     private fun handleSignOut() {
         Log.d(TAG, "Handling sign out")
 
-        // Clear all navigators and refresh tabs
-        mainTabs.forEach { tab ->
-            val navigatorHost = supportFragmentManager.findFragmentById(
-                tab.configuration.navigatorHostId,
-            ) as? dev.hotwire.navigation.navigator.NavigatorHost
-            navigatorHost?.navigator?.clearAll()
-        }
+        // Clear cookies and WebView data
+        clearWebViewData()
 
-        // Reset to first tab
-        bottomNavigationController.selectTab(0)
+        // Reset all navigators to their start locations
+        resetAllNavigators()
 
-        // Navigate to sign in
-        activity.delegate.currentNavigator?.route(SIGN_IN_URL)
+        // Navigate to sign in on the current navigator
+        Handler(Looper.getMainLooper()).postDelayed({
+            activity.delegate.currentNavigator?.route(
+                location = SIGN_IN_URL,
+                options = VisitOptions(),
+                bundle = Bundle().apply {
+                    putString("presentation", "modal")
+                },
+            )
+        }, SIGN_IN_NAVIGATION_DELAY_MS)
     }
 
-    fun refreshAllTabs() {
-        Log.d(TAG, "Refreshing all tabs")
+    private fun refreshAllTabs() {
+        Log.d(TAG, "Authentication state changed - refreshing tabs")
 
+        // Reset all navigators to get fresh state
+        resetAllNavigators()
+    }
+
+    private fun clearWebViewData() {
+        Log.d(TAG, "Clearing WebView data")
+
+        // Clear cookies
+        android.webkit.CookieManager.getInstance().apply {
+            removeAllCookies(null)
+            flush()
+        }
+
+        // Clear WebStorage
+        android.webkit.WebStorage.getInstance().deleteAllData()
+    }
+
+    private fun resetAllNavigators() {
+        Log.d(TAG, "Resetting all navigators to start locations")
+
+        // Reset each tab's navigator to its start location
         mainTabs.forEach { tab ->
             val navigatorHost = supportFragmentManager.findFragmentById(
                 tab.configuration.navigatorHostId,
             ) as? dev.hotwire.navigation.navigator.NavigatorHost
-            navigatorHost?.navigator?.currentDestination?.refresh(displayProgress = false)
+
+            navigatorHost?.navigator?.reset()
         }
     }
 }
