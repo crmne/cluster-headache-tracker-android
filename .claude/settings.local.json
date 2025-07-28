@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(./gradlew:*)",
+      "Bash(mkdir:*)",
+      "Bash(java:*)",
+      "Bash(/usr/libexec/java_home:*)",
+      "Bash(/usr/bin/java:*)",
+      "Bash(ls:*)",
+      "Bash(rm:*)",
+      "WebFetch(domain:native.hotwired.dev)",
+      "Bash(adb:*)",
+      "Bash(mv:*)",
+      "Bash(sudo dnf install:*)",
+      "Bash(VBoxManage:*)",
+      "Bash(systemctl:*)",
+      "Bash(cat:*)",
+      "Bash(emulator:*)",
+      "Bash(/home/carmine/Android/Sdk/emulator/emulator -list-avds)",
+      "Bash(dmesg:*)",
+      "Bash(journalctl:*)",
+      "Bash(echo:*)",
+      "Bash(~/Android/Sdk/emulator/emulator:*)",
+      "Bash(readlink:*)",
+      "Bash(update-alternatives:*)"
+    ],
+    "deny": []
+  }
+}

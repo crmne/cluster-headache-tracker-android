@@ -1,6 +1,41 @@
 {
-  "settings": {},
+  "settings": {
+    "screenshots_enabled": false
+  },
   "rules": [
+    {
+      "patterns": [
+        "/users/sign_in$",
+        "/users/sign_up$",
+        "/users/password/new$",
+        "/users/password/edit$",
+        "/login$",
+        "/signup$",
+        "/register$",
+        "/sessions/new$",
+        "/session$"
+      ],
+      "properties": {
+        "context": "modal",
+        "uri": "hotwire://fragment/web/modal",
+        "presentation": "modal",
+        "pull_to_refresh_enabled": false
+      }
+    },
+    {
+      "patterns": [
+        "/headache_logs/new$",
+        "/headache_logs/.*/edit$",
+        "/settings/devices/new$",
+        "/settings/devices/.*/edit$"
+      ],
+      "properties": {
+        "context": "modal",
+        "uri": "hotwire://fragment/web/modal",
+        "presentation": "modal",
+        "pull_to_refresh_enabled": false
+      }
+    },
     {
       "patterns": [
         "/headache_logs$",
@@ -16,13 +51,11 @@
     },
     {
       "patterns": [
-        "/headache_logs/new$",
-        "/headache_logs/.*/edit$"
+        ".*"
       ],
       "properties": {
-        "context": "modal",
-        "uri": "hotwire://fragment/web/modal/sheet",
-        "pull_to_refresh_enabled": false
+        "uri": "hotwire://fragment/web",
+        "pull_to_refresh_enabled": true
       }
     }
   ]

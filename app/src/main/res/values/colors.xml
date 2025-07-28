@@ -2,4 +2,13 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    
+    <!-- Primary brand colors from Rails app -->
+    <color name="primary">#4f46e5</color>
+    <color name="primary_dark">#3730a3</color>
+    <color name="primary_light">#6366f1</color>
+    
+    <!-- Bottom navigation colors -->
+    <color name="bottom_nav_selected">@color/primary</color>
+    <color name="bottom_nav_unselected">#9ca3af</color>
 </resources>
