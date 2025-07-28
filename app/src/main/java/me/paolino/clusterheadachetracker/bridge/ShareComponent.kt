@@ -29,6 +29,7 @@ class ShareComponent(name: String, private val bridgeDelegate: BridgeDelegate<Ho
         when (message.event) {
             "connect" -> addButton(message)
             "disconnect" -> removeButton()
+            "share" -> handleShare(message)
             else -> Log.w("ShareComponent", "Unknown event for message: $message")
         }
     }
@@ -68,8 +69,31 @@ class ShareComponent(name: String, private val bridgeDelegate: BridgeDelegate<Ho
         fragment.requireActivity().startActivity(Intent.createChooser(intent, "Share via"))
     }
 
+    private fun handleShare(message: Message) {
+        val data = message.data<ShareData>() ?: return
+        val shareText = buildString {
+            append(data.title ?: "Check this out")
+            append("\n\n")
+            data.text?.let { append("$it\n\n") }
+            append(data.url)
+        }
+
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, shareText)
+            putExtra(Intent.EXTRA_SUBJECT, data.title ?: "")
+        }
+        fragment.requireActivity().startActivity(Intent.createChooser(intent, "Share via"))
+
+        // Reply to JavaScript to indicate completion
+        replyTo(message.event)
+    }
+
     @Serializable
     data class MessageData(val url: String)
+
+    @Serializable
+    data class ShareData(val url: String, val title: String? = null, val text: String? = null)
 }
 
 @Composable
