@@ -14,6 +14,7 @@ import me.paolino.clusterheadachetracker.fragments.WebFragment
 import me.paolino.clusterheadachetracker.fragments.WebModalFragment
 import me.paolino.clusterheadachetracker.bridge.ButtonComponent
 import me.paolino.clusterheadachetracker.bridge.ShareComponent
+import dev.hotwire.core.bridge.KotlinXJsonConverter
 
 class ClusterHeadacheTrackerApplication : Application() {
     
@@ -39,6 +40,9 @@ class ClusterHeadacheTrackerApplication : Application() {
         val appVersion = packageInfo.versionName
         val buildNumber = packageInfo.versionCode
         Hotwire.config.applicationUserAgentPrefix = "Turbo Native; ClusterHeadacheTracker/$appVersion.$buildNumber;"
+        
+        // Configure JSON converter for bridge components
+        Hotwire.config.jsonConverter = KotlinXJsonConverter()
         
         // Load path configuration
         Hotwire.loadPathConfiguration(

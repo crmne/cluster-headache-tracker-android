@@ -47,7 +47,7 @@ This is a Hotwire Native Android app that wraps the Cluster Headache Tracker web
 ## Architecture
 
 ### Technology Stack
-- **Hotwire Native 1.1.0**: Web-to-native bridge framework
+- **Hotwire Native 1.2.0**: Web-to-native bridge framework
 - **Kotlin**: Primary development language
 - **Android SDK 34**: Target Android 14 (API 34), minimum Android 9 (API 28)
 - **Gradle 8.9 with Kotlin DSL**: Build system

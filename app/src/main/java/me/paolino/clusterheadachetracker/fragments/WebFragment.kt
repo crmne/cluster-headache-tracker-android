@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebSettings
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import dev.hotwire.core.bridge.BridgeComponent
@@ -16,6 +17,7 @@ import dev.hotwire.navigation.fragments.HotwireWebFragment
 import dev.hotwire.core.turbo.visit.VisitOptions
 import kotlinx.coroutines.launch
 import me.paolino.clusterheadachetracker.MainActivity
+import me.paolino.clusterheadachetracker.BuildConfig
 import me.paolino.clusterheadachetracker.bridge.ButtonComponent
 import me.paolino.clusterheadachetracker.bridge.ShareComponent
 import me.paolino.clusterheadachetracker.util.AuthEvents
@@ -36,6 +38,34 @@ class WebFragment : HotwireWebFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // Bridge components will handle their own menu items through the activity
+        
+        // Delay WebView configuration to ensure it's fully initialized
+        view.post {
+            configureWebView()
+        }
+    }
+    
+    private fun configureWebView() {
+        try {
+            // Configure WebView settings for form submission
+            navigator.session.webView.apply {
+                settings.apply {
+                    // Enable form data and autofill
+                    saveFormData = true
+                    domStorageEnabled = true
+                    
+                    // Ensure JavaScript is enabled (should be by default with Hotwire)
+                    javaScriptEnabled = true
+                    
+                    // Allow mixed content for development
+                    if (BuildConfig.DEBUG) {
+                        mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error configuring WebView", e)
+        }
     }
     
     override fun onVisitCompleted(location: String, completedOffline: Boolean) {
@@ -47,8 +77,8 @@ class WebFragment : HotwireWebFragment() {
             val intent = Intent(AuthEvents.AUTHENTICATION_CHANGED)
             LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
         }
-        
     }
+    
     
     override fun onVisitErrorReceived(location: String, error: VisitError) {
         when (error) {
@@ -78,5 +108,6 @@ class WebFragment : HotwireWebFragment() {
             )
         }
     }
+    
     
 }

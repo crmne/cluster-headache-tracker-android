@@ -63,11 +63,6 @@ class MainActivity : HotwireActivity() {
         // Primary color from Rails app (#4f46e5)
         val primaryColor = Color.parseColor("#4f46e5")
         
-        // Configure action bar
-        supportActionBar?.apply {
-            setBackgroundDrawable(android.graphics.drawable.ColorDrawable(primaryColor))
-        }
-        
         // Configure status bar color
         window.statusBarColor = primaryColor
     }
