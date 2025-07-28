@@ -1,148 +1,83 @@
 package me.paolino.clusterheadachetracker.bridge
 
-import android.content.Intent
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import android.view.Gravity
+import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.unit.sp
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.bridge.Message
 import dev.hotwire.navigation.destinations.HotwireDestination
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import dev.hotwire.navigation.fragments.HotwireFragment
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import me.paolino.clusterheadachetracker.R
-import me.paolino.clusterheadachetracker.util.AuthEvents
 
-class ButtonComponent(name: String, private val delegate: BridgeDelegate<HotwireDestination>) :
-    BridgeComponent<HotwireDestination>(name, delegate) {
+class ButtonComponent(name: String, private val bridgeDelegate: BridgeDelegate<HotwireDestination>) :
+    BridgeComponent<HotwireDestination>(name, bridgeDelegate) {
 
     companion object {
         private const val TAG = "ButtonComponent"
-        private const val SIGN_OUT_DELAY_MS = 500L
+        private const val BUTTON_ID_START = 100
     }
 
-    private val fragment: Fragment
-        get() = delegate.destination.fragment
-
-    private val activity: AppCompatActivity?
-        get() = fragment.activity as? AppCompatActivity
-
-    private var currentButtonTitle: String? = null
-    private var currentMessage: Message? = null
-    private var menuItem: MenuItem? = null
-
-    init {
-        // Remove any existing menu items when component is created
-        cleanupMenuItems()
-    }
+    private var buttonId = BUTTON_ID_START // Start with a high ID to avoid conflicts
+    private val fragment: HotwireFragment
+        get() = bridgeDelegate.destination.fragment as HotwireFragment
 
     override fun onReceive(message: Message) {
         when (message.event) {
-            "connect" -> handleConnect(message)
-            "disconnect" -> handleDisconnect()
-            else -> Log.w(TAG, "Unknown event: ${message.event}")
+            "connect" -> addButton(message)
+            "disconnect" -> removeButton()
+            else -> Log.w(TAG, "Unknown event for message: $message")
         }
     }
 
-    private fun handleConnect(message: Message) {
+    private fun addButton(message: Message) {
+        removeButton()
         val data = message.data<MessageData>() ?: return
-        Log.d(TAG, "Received button connect: ${data.title}")
 
-        currentButtonTitle = data.title
-        currentMessage = message
+        // Generate unique ID for this button
+        buttonId++
+        val currentButtonId = buttonId
 
-        // Clean up any existing menu items first
-        cleanupMenuItems()
-
-        // Add menu item to the toolbar
-        fragment.view?.let { view ->
-            // Get the fragment's toolbar
-            val toolbar = view.findViewById<com.google.android.material.appbar.MaterialToolbar>(
-                dev.hotwire.navigation.R.id.toolbar,
-            )
-            val menu = toolbar?.menu
-
-            menu?.let { m ->
-                // Add new menu item
-                val newItem = m.add(0, Menu.FIRST, Menu.NONE, data.title)
-                newItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-
-                // Handle icon if provided
-                data.androidImage?.let { imageName ->
-                    val resourceId = fragment.resources.getIdentifier(
-                        imageName,
-                        "drawable",
-                        fragment.requireContext().packageName,
-                    )
-                    if (resourceId != 0) {
-                        newItem.setIcon(resourceId)
-                    }
-                }
-
-                // Set click listener
-                newItem.setOnMenuItemClickListener {
-                    handleButtonClick()
-                    true
-                }
-
-                menuItem = newItem
+        val composeView = ComposeView(fragment.requireContext()).apply {
+            id = currentButtonId
+            setContent {
+                ToolbarButton(
+                    title = data.title,
+                    androidImage = data.androidImage,
+                    onClick = { performClick() },
+                )
             }
         }
+
+        val layoutParams = Toolbar.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+        ).apply { gravity = Gravity.END }
+
+        val toolbar = fragment.toolbarForNavigation()
+        toolbar?.addView(composeView, layoutParams)
     }
 
-    private fun handleDisconnect() {
-        Log.d(TAG, "Button disconnected")
-        currentButtonTitle = null
-        currentMessage = null
-
-        // Remove menu item
-        cleanupMenuItems()
-    }
-
-    private fun cleanupMenuItems() {
-        fragment.view?.let { view ->
-            val toolbar = view.findViewById<com.google.android.material.appbar.MaterialToolbar>(
-                dev.hotwire.navigation.R.id.toolbar,
-            )
-            toolbar?.menu?.let { menu ->
-                // Remove our menu item
-                menuItem?.let { item ->
-                    menu.removeItem(item.itemId)
-                }
-            }
-        }
-        menuItem = null
-    }
-
-    private fun handleButtonClick() {
-        Log.d(TAG, "Button clicked: $currentButtonTitle")
-
-        // Reply to the web page
-        currentMessage?.let { message ->
-            replyTo(message.event)
-        }
-
-        // Check if this is a sign out button
-        if (currentButtonTitle?.contains("Sign Out", ignoreCase = true) == true) {
-            handleSignOut()
+    private fun removeButton() {
+        val toolbar = fragment.toolbarForNavigation()
+        // Remove all button views we've added
+        for (id in BUTTON_ID_START..buttonId) {
+            val button = toolbar?.findViewById<ComposeView>(id)
+            toolbar?.removeView(button)
         }
     }
 
-    private fun handleSignOut() {
-        // After a delay, trigger the sign out flow
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(SIGN_OUT_DELAY_MS)
-            val intent = Intent(AuthEvents.SIGN_OUT_REQUESTED)
-            LocalBroadcastManager.getInstance(fragment.requireContext())
-                .sendBroadcast(intent)
-        }
+    private fun performClick() {
+        replyTo("connect")
     }
 
     @Serializable
@@ -151,4 +86,26 @@ class ButtonComponent(name: String, private val delegate: BridgeDelegate<Hotwire
         @SerialName("iosImage") val iosImage: String? = null,
         @SerialName("androidImage") val androidImage: String? = null,
     )
+}
+
+@Composable
+@Suppress("FunctionNaming")
+private fun ToolbarButton(
+    title: String,
+    @Suppress("UNUSED_PARAMETER") androidImage: String? = null,
+    onClick: () -> Unit,
+) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent,
+            contentColor = Color.Black,
+        ),
+    ) {
+        // For now, just show text until Material Symbols font is added
+        Text(
+            text = title,
+            fontSize = 14.sp,
+        )
+    }
 }

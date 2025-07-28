@@ -19,6 +19,7 @@ spotless {
                     "max_line_length" to 120,
                     "insert_final_newline" to true,
                     "ktlint_standard_no-wildcard-imports" to "disabled",
+                    "ktlint_standard_function-naming" to "disabled",
                 ),
             )
     }
