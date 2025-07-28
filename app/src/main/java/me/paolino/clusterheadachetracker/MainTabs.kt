@@ -9,8 +9,8 @@ private val logs = HotwireBottomTab(
     configuration = NavigatorConfiguration(
         name = "logs",
         navigatorHostId = R.id.logs_navigator_host,
-        startLocation = "${AppConfig.baseUrl}/headache_logs"
-    )
+        startLocation = "${AppConfig.baseUrl}/headache_logs",
+    ),
 )
 
 private val charts = HotwireBottomTab(
@@ -19,8 +19,8 @@ private val charts = HotwireBottomTab(
     configuration = NavigatorConfiguration(
         name = "charts",
         navigatorHostId = R.id.charts_navigator_host,
-        startLocation = "${AppConfig.baseUrl}/charts"
-    )
+        startLocation = "${AppConfig.baseUrl}/charts",
+    ),
 )
 
 private val new = HotwireBottomTab(
@@ -29,8 +29,8 @@ private val new = HotwireBottomTab(
     configuration = NavigatorConfiguration(
         name = "new",
         navigatorHostId = R.id.new_navigator_host,
-        startLocation = "${AppConfig.baseUrl}/headache_logs"
-    )
+        startLocation = "${AppConfig.baseUrl}/headache_logs",
+    ),
 )
 
 private val account = HotwireBottomTab(
@@ -39,8 +39,8 @@ private val account = HotwireBottomTab(
     configuration = NavigatorConfiguration(
         name = "account",
         navigatorHostId = R.id.account_navigator_host,
-        startLocation = "${AppConfig.baseUrl}/settings"
-    )
+        startLocation = "${AppConfig.baseUrl}/settings",
+    ),
 )
 
 private val feedback = HotwireBottomTab(
@@ -49,8 +49,8 @@ private val feedback = HotwireBottomTab(
     configuration = NavigatorConfiguration(
         name = "feedback",
         navigatorHostId = R.id.feedback_navigator_host,
-        startLocation = "${AppConfig.baseUrl}/feedback"
-    )
+        startLocation = "${AppConfig.baseUrl}/feedback",
+    ),
 )
 
 val mainTabs = listOf(
@@ -58,5 +58,5 @@ val mainTabs = listOf(
     charts,
     new,
     account,
-    feedback
+    feedback,
 )

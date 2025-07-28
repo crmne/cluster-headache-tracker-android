@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Android Pre-Commit Hook
+# Runs Spotless and Detekt checks before committing
+
+set -e
+
+echo "Running pre-commit checks..."
+echo ""
+
+# Run Spotless check
+echo "📝 Running Spotless check..."
+if ./gradlew spotlessCheck --daemon; then
+    echo "✅ Spotless check passed"
+else
+    echo "❌ Spotless check failed"
+    echo ""
+    echo "💡 Run './gradlew spotlessApply' to automatically fix formatting issues"
+    exit 1
+fi
+
+echo ""
+
+# Run Detekt
+echo "🔍 Running Detekt analysis..."
+if ./gradlew detekt --daemon; then
+    echo "✅ Detekt analysis passed"
+else
+    echo "❌ Detekt found issues"
+    echo ""
+    echo "💡 Check the report at: build/reports/detekt/detekt.html"
+    exit 1
+fi
+
+echo ""
+
+# Run Android Lint on changed files
+echo "🤖 Running Android Lint..."
+if ./gradlew lintDebug --daemon; then
+    echo "✅ Android Lint passed"
+else
+    echo "❌ Android Lint found issues"
+    echo ""
+    echo "💡 Check the report at: app/build/reports/lint-results-debug.html"
+    exit 1
+fi
+
+echo ""
+echo "✅ All pre-commit checks passed!"
