@@ -31,7 +31,11 @@ class MainActivity : HotwireActivity() {
         const val NEW_TAB_INDEX = 2 // Index of the "New" tab
         private const val SIGN_IN_MODAL_DELAY_MS = 500L
         private const val SIGN_IN_NAVIGATION_DELAY_MS = 100L
+        private const val TAB_REFRESH_DELAY_MS = 100L
     }
+
+    private var authenticationChanged = false
+    private val refreshedTabs = mutableSetOf<Int>()
 
     private val activity: HotwireActivity
         get() = this@MainActivity
@@ -110,6 +114,29 @@ class MainActivity : HotwireActivity() {
                 // Return to the previous tab - stay on current tab
                 false // Don't select the "New" tab
             } else {
+                // Check if this tab needs refresh after authentication
+                if (authenticationChanged && !refreshedTabs.contains(index)) {
+                    Log.d(TAG, "Refreshing tab $index after authentication change")
+                    refreshedTabs.add(index)
+
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        val navigatorHost = supportFragmentManager.findFragmentById(
+                            tab.configuration.navigatorHostId,
+                        ) as? dev.hotwire.navigation.navigator.NavigatorHost
+
+                        // Navigate to the tab's default URL
+                        navigatorHost?.navigator?.route(
+                            location = tab.configuration.startLocation,
+                            options = VisitOptions(),
+                        )
+
+                        // If all tabs have been refreshed, reset the flag
+                        if (refreshedTabs.size >= mainTabs.size - 1) { // -1 for the "New" tab
+                            authenticationChanged = false
+                            refreshedTabs.clear()
+                        }
+                    }, TAB_REFRESH_DELAY_MS)
+                }
                 true // Allow normal tab selection
             }
         }
@@ -147,8 +174,18 @@ class MainActivity : HotwireActivity() {
         // Clear cookies and WebView data
         clearWebViewData()
 
+        // Mark that authentication has changed
+        authenticationChanged = true
+        refreshedTabs.clear()
+
         // Reset all navigators to their start locations
-        resetAllNavigators()
+        mainTabs.forEach { tab ->
+            val navigatorHost = supportFragmentManager.findFragmentById(
+                tab.configuration.navigatorHostId,
+            ) as? dev.hotwire.navigation.navigator.NavigatorHost
+
+            navigatorHost?.navigator?.reset()
+        }
 
         // Navigate to sign in on the current navigator
         Handler(Looper.getMainLooper()).postDelayed({
@@ -163,10 +200,24 @@ class MainActivity : HotwireActivity() {
     }
 
     private fun refreshAllTabs() {
-        Log.d(TAG, "Authentication state changed - refreshing tabs")
+        Log.d(TAG, "Authentication state changed - marking tabs for refresh")
 
-        // Reset all navigators to get fresh state
-        resetAllNavigators()
+        // Mark that authentication has changed
+        authenticationChanged = true
+        refreshedTabs.clear()
+
+        // Get current tab index
+        val currentTabIndex = bottomNavigationController.view.selectedItemId
+
+        // Refresh the current tab immediately
+        if (currentTabIndex != NEW_TAB_INDEX) {
+            refreshedTabs.add(currentTabIndex)
+            val currentTab = mainTabs[currentTabIndex]
+            activity.delegate.currentNavigator?.route(
+                location = currentTab.configuration.startLocation,
+                options = VisitOptions(),
+            )
+        }
     }
 
     private fun clearWebViewData() {
@@ -180,18 +231,5 @@ class MainActivity : HotwireActivity() {
 
         // Clear WebStorage
         android.webkit.WebStorage.getInstance().deleteAllData()
-    }
-
-    private fun resetAllNavigators() {
-        Log.d(TAG, "Resetting all navigators to start locations")
-
-        // Reset each tab's navigator to its start location
-        mainTabs.forEach { tab ->
-            val navigatorHost = supportFragmentManager.findFragmentById(
-                tab.configuration.navigatorHostId,
-            ) as? dev.hotwire.navigation.navigator.NavigatorHost
-
-            navigatorHost?.navigator?.reset()
-        }
     }
 }
