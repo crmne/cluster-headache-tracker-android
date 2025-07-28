@@ -2,10 +2,10 @@ package me.paolino.clusterheadachetracker.bridge
 
 import android.content.Intent
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeDelegate
@@ -17,6 +17,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import me.paolino.clusterheadachetracker.R
 import me.paolino.clusterheadachetracker.util.AuthEvents
 
 class ButtonComponent(name: String, private val delegate: BridgeDelegate<HotwireDestination>) :
@@ -34,7 +35,13 @@ class ButtonComponent(name: String, private val delegate: BridgeDelegate<Hotwire
         get() = fragment.activity as? AppCompatActivity
 
     private var currentButtonTitle: String? = null
-    private var menuProvider: MenuProvider? = null
+    private var currentMessage: Message? = null
+    private var menuItem: MenuItem? = null
+
+    init {
+        // Remove any existing menu items when component is created
+        cleanupMenuItems()
+    }
 
     override fun onReceive(message: Message) {
         when (message.event) {
@@ -49,49 +56,78 @@ class ButtonComponent(name: String, private val delegate: BridgeDelegate<Hotwire
         Log.d(TAG, "Received button connect: ${data.title}")
 
         currentButtonTitle = data.title
+        currentMessage = message
 
-        // Remove any existing menu provider
-        menuProvider?.let { provider ->
-            activity?.removeMenuProvider(provider)
-        }
+        // Clean up any existing menu items first
+        cleanupMenuItems()
 
-        // Create and add new menu provider
-        menuProvider = object : MenuProvider {
-            override fun onCreateMenu(menu: android.view.Menu, menuInflater: android.view.MenuInflater) {
-                currentButtonTitle?.let { title ->
-                    val menuItem = menu.add(0, android.view.Menu.FIRST, android.view.Menu.NONE, title)
-                    menuItem.setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_ALWAYS)
+        // Add menu item to the toolbar
+        fragment.view?.let { view ->
+            // Get the fragment's toolbar
+            val toolbar = view.findViewById<com.google.android.material.appbar.MaterialToolbar>(
+                dev.hotwire.navigation.R.id.toolbar,
+            )
+            val menu = toolbar?.menu
+
+            menu?.let { m ->
+                // Add new menu item
+                val newItem = m.add(0, Menu.FIRST, Menu.NONE, data.title)
+                newItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+
+                // Handle icon if provided
+                data.androidImage?.let { imageName ->
+                    val resourceId = fragment.resources.getIdentifier(
+                        imageName,
+                        "drawable",
+                        fragment.requireContext().packageName,
+                    )
+                    if (resourceId != 0) {
+                        newItem.setIcon(resourceId)
+                    }
                 }
-            }
 
-            override fun onMenuItemSelected(menuItem: android.view.MenuItem): Boolean =
-                if (menuItem.itemId == android.view.Menu.FIRST) {
+                // Set click listener
+                newItem.setOnMenuItemClickListener {
                     handleButtonClick()
                     true
-                } else {
-                    false
                 }
-        }
 
-        activity?.addMenuProvider(menuProvider!!, fragment.viewLifecycleOwner, Lifecycle.State.RESUMED)
+                menuItem = newItem
+            }
+        }
     }
 
     private fun handleDisconnect() {
         Log.d(TAG, "Button disconnected")
         currentButtonTitle = null
+        currentMessage = null
 
-        // Remove menu provider when disconnecting
-        menuProvider?.let { provider ->
-            activity?.removeMenuProvider(provider)
+        // Remove menu item
+        cleanupMenuItems()
+    }
+
+    private fun cleanupMenuItems() {
+        fragment.view?.let { view ->
+            val toolbar = view.findViewById<com.google.android.material.appbar.MaterialToolbar>(
+                dev.hotwire.navigation.R.id.toolbar,
+            )
+            toolbar?.menu?.let { menu ->
+                // Remove our menu item
+                menuItem?.let { item ->
+                    menu.removeItem(item.itemId)
+                }
+            }
         }
-        menuProvider = null
+        menuItem = null
     }
 
     private fun handleButtonClick() {
         Log.d(TAG, "Button clicked: $currentButtonTitle")
 
-        // Reply to the connect event when button is clicked
-        replyTo("connect")
+        // Reply to the web page
+        currentMessage?.let { message ->
+            replyTo(message.event)
+        }
 
         // Check if this is a sign out button
         if (currentButtonTitle?.contains("Sign Out", ignoreCase = true) == true) {

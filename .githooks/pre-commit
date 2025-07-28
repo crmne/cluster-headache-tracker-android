@@ -1,0 +1,200 @@
+#!/bin/bash
+
+# Android Git Pre-Commit Hook
+# Similar to overcommit for Rails, but for Android/Kotlin projects
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Configuration file
+CONFIG_FILE=".githooks/config.json"
+
+# Function to print colored output
+print_status() {
+    local status=$1
+    local message=$2
+    case $status in
+        "success")
+            echo -e "${GREEN}✓${NC} $message"
+            ;;
+        "error")
+            echo -e "${RED}✗${NC} $message"
+            ;;
+        "warning")
+            echo -e "${YELLOW}⚠${NC} $message"
+            ;;
+        "info")
+            echo -e "  $message"
+            ;;
+    esac
+}
+
+# Function to check if a check is enabled
+is_check_enabled() {
+    local check_name=$1
+    if [ -f "$CONFIG_FILE" ]; then
+        enabled=$(jq -r ".pre_commit.$check_name.enabled // true" "$CONFIG_FILE" 2>/dev/null || echo "true")
+        [ "$enabled" = "true" ]
+    else
+        true
+    fi
+}
+
+# Initialize error tracking
+ERRORS=0
+
+echo "Running pre-commit checks..."
+echo ""
+
+# 1. Kotlin Syntax Check (equivalent to RubySyntax)
+if is_check_enabled "kotlin_syntax"; then
+    echo "Checking Kotlin syntax..."
+    if ./gradlew compileDebugKotlin --offline --daemon > /dev/null 2>&1; then
+        print_status "success" "Kotlin syntax check passed"
+    else
+        print_status "error" "Kotlin syntax errors found"
+        print_status "info" "Run './gradlew compileDebugKotlin' to see details"
+        ((ERRORS++))
+    fi
+    echo ""
+fi
+
+# 2. Android Lint (equivalent to RuboCop)
+if is_check_enabled "android_lint"; then
+    echo "Running Android Lint..."
+    # Get list of changed files
+    changed_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(kt|java|xml)$' || true)
+    
+    if [ -n "$changed_files" ]; then
+        if ./gradlew lintDebug --offline --daemon > /dev/null 2>&1; then
+            print_status "success" "Android Lint passed"
+        else
+            print_status "error" "Android Lint found issues"
+            print_status "info" "View report at: app/build/reports/lint-results-debug.html"
+            ((ERRORS++))
+        fi
+    else
+        print_status "info" "No Kotlin/Java/XML files to lint"
+    fi
+    echo ""
+fi
+
+# 3. Detekt - Static Code Analysis (additional Kotlin-specific linting)
+if is_check_enabled "detekt" && [ -f "build.gradle.kts" ] && grep -q "detekt" build.gradle.kts 2>/dev/null; then
+    echo "Running Detekt..."
+    if ./gradlew detekt --offline --daemon > /dev/null 2>&1; then
+        print_status "success" "Detekt analysis passed"
+    else
+        print_status "error" "Detekt found code issues"
+        print_status "info" "Run './gradlew detekt' to see details"
+        ((ERRORS++))
+    fi
+    echo ""
+fi
+
+# 4. Trailing Whitespace Check
+if is_check_enabled "trailing_whitespace"; then
+    echo "Checking for trailing whitespace..."
+    files_with_whitespace=$(git diff --cached --name-only --diff-filter=ACM | xargs -I {} sh -c 'grep -l "[[:space:]]$" "{}" 2>/dev/null || true' | grep -v "node_modules" | grep -v "build/" || true)
+    
+    if [ -z "$files_with_whitespace" ]; then
+        print_status "success" "No trailing whitespace found"
+    else
+        print_status "error" "Trailing whitespace found in:"
+        echo "$files_with_whitespace" | while read -r file; do
+            print_status "info" "$file"
+        done
+        
+        # Auto-fix if enabled
+        if [ "$(jq -r '.pre_commit.trailing_whitespace.auto_correct // false' "$CONFIG_FILE" 2>/dev/null || echo "false")" = "true" ]; then
+            echo "$files_with_whitespace" | while read -r file; do
+                sed -i 's/[[:space:]]*$//' "$file"
+                git add "$file"
+            done
+            print_status "success" "Auto-corrected trailing whitespace"
+        else
+            ((ERRORS++))
+        fi
+    fi
+    echo ""
+fi
+
+# 5. File Size Check (equivalent to FileSize)
+if is_check_enabled "file_size"; then
+    echo "Checking file sizes..."
+    max_size=$(jq -r '.pre_commit.file_size.max_size // "5M"' "$CONFIG_FILE" 2>/dev/null || echo "5M")
+    large_files=$(git diff --cached --name-only --diff-filter=ACM | xargs -I {} sh -c 'find "{}" -size +'"$max_size"' 2>/dev/null || true')
+    
+    if [ -z "$large_files" ]; then
+        print_status "success" "No large files found"
+    else
+        print_status "warning" "Large files detected (>${max_size}):"
+        echo "$large_files" | while read -r file; do
+            print_status "info" "$file"
+        done
+    fi
+    echo ""
+fi
+
+# 6. Gradle Dependencies Check (equivalent to BundleCheck)
+if is_check_enabled "gradle_check"; then
+    echo "Checking Gradle dependencies..."
+    if ./gradlew dependencies --offline --daemon > /dev/null 2>&1; then
+        print_status "success" "Gradle dependencies check passed"
+    else
+        print_status "error" "Gradle dependencies check failed"
+        ((ERRORS++))
+    fi
+    echo ""
+fi
+
+# 7. TODO/FIXME Check
+if is_check_enabled "todo_check"; then
+    echo "Checking for TODO/FIXME comments..."
+    todos=$(git diff --cached --name-only --diff-filter=ACM | xargs -I {} sh -c 'grep -n "TODO\|FIXME" "{}" 2>/dev/null | sed "s/^/{}:/"' || true)
+    
+    if [ -z "$todos" ]; then
+        print_status "success" "No TODO/FIXME comments in staged files"
+    else
+        print_status "warning" "TODO/FIXME comments found:"
+        echo "$todos" | while read -r todo; do
+            print_status "info" "$todo"
+        done
+    fi
+    echo ""
+fi
+
+# 8. Kotlin Code Format Check (using ktlint if available)
+if is_check_enabled "ktlint" && command -v ktlint >/dev/null 2>&1; then
+    echo "Running ktlint..."
+    changed_kt_files=$(git diff --cached --name-only --diff-filter=ACM | grep '\.kt$' || true)
+    
+    if [ -n "$changed_kt_files" ]; then
+        if echo "$changed_kt_files" | xargs ktlint --relative > /dev/null 2>&1; then
+            print_status "success" "ktlint passed"
+        else
+            print_status "error" "ktlint found style violations"
+            print_status "info" "Run 'ktlint' to see details or 'ktlint -F' to auto-fix"
+            ((ERRORS++))
+        fi
+    else
+        print_status "info" "No Kotlin files to check"
+    fi
+    echo ""
+fi
+
+# Summary
+if [ $ERRORS -eq 0 ]; then
+    print_status "success" "All pre-commit checks passed!"
+    exit 0
+else
+    print_status "error" "Pre-commit checks failed with $ERRORS error(s)"
+    print_status "info" "Fix the issues above and try again"
+    print_status "info" "To bypass hooks temporarily, use: git commit --no-verify"
+    exit 1
+fi

@@ -2,16 +2,17 @@ package me.paolino.clusterheadachetracker.bridge
 
 import android.content.Intent
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeDelegate
 import dev.hotwire.core.bridge.Message
 import dev.hotwire.navigation.destinations.HotwireDestination
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import me.paolino.clusterheadachetracker.R
 
 class ShareComponent(name: String, private val delegate: BridgeDelegate<HotwireDestination>) :
     BridgeComponent<HotwireDestination>(name, delegate) {
@@ -23,7 +24,13 @@ class ShareComponent(name: String, private val delegate: BridgeDelegate<HotwireD
         get() = fragment.activity as? AppCompatActivity
 
     private var shareUrl: String? = null
-    private var menuProvider: MenuProvider? = null
+    private var currentMessage: Message? = null
+    private var menuItem: MenuItem? = null
+
+    init {
+        // Remove any existing menu items when component is created
+        cleanupMenuItems()
+    }
 
     override fun onReceive(message: Message) {
         when (message.event) {
@@ -38,42 +45,61 @@ class ShareComponent(name: String, private val delegate: BridgeDelegate<HotwireD
         Log.d(TAG, "Received share connect: url=${data.url}")
 
         shareUrl = data.url
+        currentMessage = message
 
-        // Remove any existing menu provider
-        menuProvider?.let { provider ->
-            activity?.removeMenuProvider(provider)
-        }
+        // Clean up any existing menu items first
+        cleanupMenuItems()
 
-        // Create and add new menu provider
-        menuProvider = object : MenuProvider {
-            override fun onCreateMenu(menu: android.view.Menu, menuInflater: android.view.MenuInflater) {
-                if (shareUrl != null) {
-                    val menuItem = menu.add(0, android.view.Menu.FIRST + 1, android.view.Menu.NONE, "Share")
-                    menuItem.setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_ALWAYS)
-                }
-            }
+        // Add share menu item to the toolbar
+        fragment.view?.let { view ->
+            // Get the fragment's toolbar
+            val toolbar = view.findViewById<com.google.android.material.appbar.MaterialToolbar>(
+                dev.hotwire.navigation.R.id.toolbar,
+            )
+            val menu = toolbar?.menu
 
-            override fun onMenuItemSelected(menuItem: android.view.MenuItem): Boolean =
-                if (menuItem.itemId == android.view.Menu.FIRST + 1) {
+            menu?.let { m ->
+                // Add share menu item
+                val newItem = m.add(0, Menu.FIRST + SHARE_MENU_ID_OFFSET, Menu.NONE, "Share")
+                newItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+
+                // Add share icon
+                val shareIcon = fragment.context?.getDrawable(android.R.drawable.ic_menu_share)
+                newItem.icon = shareIcon
+
+                // Set click listener
+                newItem.setOnMenuItemClickListener {
                     performShare()
                     true
-                } else {
-                    false
                 }
-        }
 
-        activity?.addMenuProvider(menuProvider!!, fragment.viewLifecycleOwner, Lifecycle.State.RESUMED)
+                menuItem = newItem
+            }
+        }
     }
 
     private fun handleDisconnect() {
         Log.d(TAG, "Share disconnected")
         shareUrl = null
+        currentMessage = null
 
-        // Remove menu provider when disconnecting
-        menuProvider?.let { provider ->
-            activity?.removeMenuProvider(provider)
+        // Remove menu item
+        cleanupMenuItems()
+    }
+
+    private fun cleanupMenuItems() {
+        fragment.view?.let { view ->
+            val toolbar = view.findViewById<com.google.android.material.appbar.MaterialToolbar>(
+                dev.hotwire.navigation.R.id.toolbar,
+            )
+            toolbar?.menu?.let { menu ->
+                // Remove our menu item
+                menuItem?.let { item ->
+                    menu.removeItem(item.itemId)
+                }
+            }
         }
-        menuProvider = null
+        menuItem = null
     }
 
     private fun performShare() {
@@ -99,5 +125,6 @@ class ShareComponent(name: String, private val delegate: BridgeDelegate<HotwireD
 
     companion object {
         const val TAG = "ShareComponent"
+        private const val SHARE_MENU_ID_OFFSET = 100
     }
 }

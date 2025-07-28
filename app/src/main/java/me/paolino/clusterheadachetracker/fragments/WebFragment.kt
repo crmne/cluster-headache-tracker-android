@@ -33,7 +33,6 @@ class WebFragment : HotwireWebFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Bridge components will handle their own menu items through the activity
 
         // Delay WebView configuration to ensure it's fully initialized
         view.post {

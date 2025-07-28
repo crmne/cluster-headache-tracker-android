@@ -7,7 +7,7 @@ plugins {
 android {
     namespace = "me.paolino.clusterheadachetracker"
     compileSdk = 35
-    
+
     buildFeatures {
         buildConfig = true
     }
@@ -16,8 +16,8 @@ android {
         applicationId = "me.paolino.clusterheadachetracker"
         minSdk = 28
         targetSdk = 35
-        versionCode = 8
-        versionName = "1.0"
+        versionCode = 9
+        versionName = "1.0.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -27,7 +27,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
             signingConfig = signingConfigs.getByName("debug")
         }

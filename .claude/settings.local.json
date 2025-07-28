@@ -23,7 +23,11 @@
       "Bash(echo:*)",
       "Bash(~/Android/Sdk/emulator/emulator:*)",
       "Bash(readlink:*)",
-      "Bash(update-alternatives:*)"
+      "Bash(update-alternatives:*)",
+      "Bash(git add:*)",
+      "Bash(chmod:*)",
+      "Bash(grep:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   }
