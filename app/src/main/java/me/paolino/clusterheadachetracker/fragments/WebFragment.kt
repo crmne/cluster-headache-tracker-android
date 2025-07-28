@@ -68,14 +68,28 @@ class WebFragment : HotwireWebFragment() {
         super.onVisitCompleted(location, completedOffline)
 
         // Check if we just completed a successful authentication
-        // This happens when we navigate from sign_in to a main app page (not sign_up)
-        if (navigator.previousLocation?.contains("/sign_in") == true &&
+        // This can happen in several ways:
+        // 1. Rails redirects to /recede_historical_location after sign in/sign up
+        // 2. We navigate from sign_in to a main app page
+        // 3. We navigate from sign_up to a main app page
+
+        val isRecedeHistoricalLocation = location.contains("/recede_historical_location")
+        val isFromSignIn = navigator.previousLocation?.contains("/sign_in") == true &&
             !location.contains("/sign_in") &&
             !location.contains("/sign_up")
-        ) {
-            Log.d(TAG, "Authentication successful, sending authentication changed event")
+        val isFromSignUp = navigator.previousLocation?.contains("/sign_up") == true &&
+            !location.contains("/sign_in") &&
+            !location.contains("/sign_up")
+
+        if (isRecedeHistoricalLocation || isFromSignIn || isFromSignUp) {
+            Log.d(TAG, "Authentication successful (location: $location), sending authentication changed event")
             val intent = Intent(AuthEvents.AUTHENTICATION_CHANGED)
             LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
+
+            // If this was a recede_historical_location, pop back to dismiss the modal
+            if (isRecedeHistoricalLocation) {
+                navigator.pop()
+            }
         }
     }
 
