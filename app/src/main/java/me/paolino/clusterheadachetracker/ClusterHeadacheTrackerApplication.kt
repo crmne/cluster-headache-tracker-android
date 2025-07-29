@@ -48,7 +48,8 @@ class ClusterHeadacheTrackerApplication : Application() {
         Hotwire.loadPathConfiguration(
             context = this,
             location = PathConfiguration.Location(
-                assetFilePath = "json/android_v1.json",
+                assetFilePath = "json/path-configuration.json",
+                remoteFileUrl = "${AppConfig.baseUrl}/configurations/android_v2.json",
             ),
         )
 
