@@ -99,20 +99,22 @@ jobs:
         GH_TOKEN: ${{ secrets.RAILS_REPO_TOKEN }}
       run: |
         cd rails-app
+        BODY="This PR updates the Android APK to version ${{ steps.version.outputs.version_name }} (build ${{ steps.version.outputs.version_code }}).
+        
+        ## Changes
+        - Updated \`public/cluster-headache-tracker.apk\`
+        - Updated \`ANDROID_APK_VERSION\` in \`config/initializers/app_constants.rb\`
+        
+        ## APK Details
+        - Version: ${{ steps.version.outputs.version_name }}
+        - Build: ${{ steps.version.outputs.version_code }}
+        - GitHub Run Number: ${{ github.run_number }}
+        - Location: \`public/cluster-headache-tracker.apk\`
+        
+        This APK was automatically built from commit ${{ github.sha }}."
+        
         gh pr create \
           --title "Update Android APK to version ${{ steps.version.outputs.version_name }} (build ${{ steps.version.outputs.version_code }})" \
-          --body "This PR updates the Android APK to version ${{ steps.version.outputs.version_name }} (build ${{ steps.version.outputs.version_code }}).
-          
-## Changes
-- Updated \`public/cluster-headache-tracker.apk\`
-- Updated \`ANDROID_APK_VERSION\` in \`config/initializers/app_constants.rb\`
-
-## APK Details
-- Version: ${{ steps.version.outputs.version_name }}
-- Build: ${{ steps.version.outputs.version_code }}
-- GitHub Run Number: ${{ github.run_number }}
-- Location: \`public/cluster-headache-tracker.apk\`
-
-This APK was automatically built from commit ${{ github.sha }}." \
+          --body "$BODY" \
           --base main \
           --head "update-android-apk-${{ steps.version.outputs.version_name }}"
