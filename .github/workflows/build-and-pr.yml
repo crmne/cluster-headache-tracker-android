@@ -1,10 +1,10 @@
 name: Build APK and Create PR
 
 on:
-  workflow_dispatch:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   build-and-pr:
