@@ -32,7 +32,12 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:fonts.google.com)",
       "Bash(git commit:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(git push:*)",
+      "Bash(git -C ../cluster-headache-tracker status)",
+      "Bash(git -C ../cluster-headache-tracker add public/cluster-headache-tracker.apk)",
+      "Bash(git -C ../cluster-headache-tracker commit -m \"$(cat <<''EOF''\nUpdate Android APK to latest release build\n\n🤖 Generated with [Claude Code](https://claude.ai/code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)"
     ],
     "deny": []
   }

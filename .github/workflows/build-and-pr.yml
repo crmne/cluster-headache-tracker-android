@@ -95,25 +95,24 @@ jobs:
         git push origin $BRANCH_NAME
 
     - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v6
-      with:
-        token: ${{ secrets.RAILS_REPO_TOKEN }}
-        path: rails-app
-        branch: update-android-apk-${{ steps.version.outputs.version_name }}
-        title: "Update Android APK to version ${{ steps.version.outputs.version_name }} (build ${{ steps.version.outputs.version_code }})"
-        body: |
-          This PR updates the Android APK to version ${{ steps.version.outputs.version_name }} (build ${{ steps.version.outputs.version_code }}).
+      env:
+        GH_TOKEN: ${{ secrets.RAILS_REPO_TOKEN }}
+      run: |
+        cd rails-app
+        gh pr create \
+          --title "Update Android APK to version ${{ steps.version.outputs.version_name }} (build ${{ steps.version.outputs.version_code }})" \
+          --body "This PR updates the Android APK to version ${{ steps.version.outputs.version_name }} (build ${{ steps.version.outputs.version_code }}).
           
-          ## Changes
-          - Updated `public/cluster-headache-tracker.apk`
-          - Updated `ANDROID_APK_VERSION` in `config/initializers/app_constants.rb`
-          
-          ## APK Details
-          - Version: ${{ steps.version.outputs.version_name }}
-          - Build: ${{ steps.version.outputs.version_code }}
-          - GitHub Run Number: ${{ github.run_number }}
-          - Location: `public/cluster-headache-tracker.apk`
-          
-          This APK was automatically built from commit ${{ github.sha }}.
-        base: main
-        draft: false
+## Changes
+- Updated \`public/cluster-headache-tracker.apk\`
+- Updated \`ANDROID_APK_VERSION\` in \`config/initializers/app_constants.rb\`
+
+## APK Details
+- Version: ${{ steps.version.outputs.version_name }}
+- Build: ${{ steps.version.outputs.version_code }}
+- GitHub Run Number: ${{ github.run_number }}
+- Location: \`public/cluster-headache-tracker.apk\`
+
+This APK was automatically built from commit ${{ github.sha }}." \
+          --base main \
+          --head "update-android-apk-${{ steps.version.outputs.version_name }}"
