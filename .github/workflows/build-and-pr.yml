@@ -1,0 +1,101 @@
+name: Build APK and Create PR
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-pr:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Android app
+      uses: actions/checkout@v4
+      with:
+        path: android-app
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./android-app/gradlew
+
+    - name: Build Release APK
+      run: |
+        cd android-app
+        ./gradlew assembleRelease
+        
+    - name: Get version name
+      id: version
+      run: |
+        cd android-app
+        VERSION_NAME=$(grep versionName app/build.gradle.kts | sed 's/.*"\(.*\)".*/\1/')
+        VERSION_CODE=$(grep versionCode app/build.gradle.kts | sed 's/[^0-9]*\([0-9]*\).*/\1/')
+        echo "version_name=${VERSION_NAME}" >> $GITHUB_OUTPUT
+        echo "version_code=${VERSION_CODE}" >> $GITHUB_OUTPUT
+
+    - name: Rename APK
+      run: |
+        cd android-app
+        mv app/build/outputs/apk/release/app-release-unsigned.apk ../cluster-headache-tracker.apk
+
+    - name: Checkout Rails app
+      uses: actions/checkout@v4
+      with:
+        repository: Plenty/cluster-headache-tracker
+        path: rails-app
+        token: ${{ secrets.RAILS_REPO_TOKEN }}
+        lfs: true
+
+    - name: Create branch and add APK
+      run: |
+        cd rails-app
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        
+        # Create new branch
+        BRANCH_NAME="update-android-apk-${{ steps.version.outputs.version_name }}"
+        git checkout -b $BRANCH_NAME
+        
+        # Copy APK to public directory
+        cp ../cluster-headache-tracker.apk public/
+        
+        # Track with Git LFS
+        git lfs track "public/cluster-headache-tracker.apk"
+        git add .gitattributes
+        
+        # Add the APK
+        git add public/cluster-headache-tracker.apk
+        
+        # Commit
+        git commit -m "Update Android APK to version ${{ steps.version.outputs.version_name }} (${{ steps.version.outputs.version_code }})"
+        
+        # Push branch
+        git push origin $BRANCH_NAME
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v6
+      with:
+        token: ${{ secrets.RAILS_REPO_TOKEN }}
+        path: rails-app
+        branch: update-android-apk-${{ steps.version.outputs.version_name }}
+        title: "Update Android APK to version ${{ steps.version.outputs.version_name }}"
+        body: |
+          This PR updates the Android APK to version ${{ steps.version.outputs.version_name }} (build ${{ steps.version.outputs.version_code }}).
+          
+          ## Changes
+          - Updated `public/cluster-headache-tracker.apk`
+          
+          ## APK Details
+          - Version: ${{ steps.version.outputs.version_name }}
+          - Build: ${{ steps.version.outputs.version_code }}
+          - Location: `public/cluster-headache-tracker.apk`
+          
+          This APK was automatically built from commit ${{ github.sha }}.
+        base: main
+        draft: false
