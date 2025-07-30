@@ -47,7 +47,7 @@ jobs:
     - name: Checkout Rails app
       uses: actions/checkout@v4
       with:
-        repository: Plenty/cluster-headache-tracker
+        repository: crmne/cluster-headache-tracker
         path: rails-app
         token: ${{ secrets.RAILS_REPO_TOKEN }}
         lfs: true
@@ -65,12 +65,16 @@ jobs:
         # Copy APK to public directory
         cp ../cluster-headache-tracker.apk public/
         
+        # Update version in app_constants.rb
+        sed -i 's/ANDROID_APK_VERSION = ".*"/ANDROID_APK_VERSION = "${{ steps.version.outputs.version_name }}"/' config/initializers/app_constants.rb
+        
         # Track with Git LFS
         git lfs track "public/cluster-headache-tracker.apk"
         git add .gitattributes
         
-        # Add the APK
+        # Add the APK and version update
         git add public/cluster-headache-tracker.apk
+        git add config/initializers/app_constants.rb
         
         # Commit
         git commit -m "Update Android APK to version ${{ steps.version.outputs.version_name }} (${{ steps.version.outputs.version_code }})"
@@ -90,6 +94,7 @@ jobs:
           
           ## Changes
           - Updated `public/cluster-headache-tracker.apk`
+          - Updated `ANDROID_APK_VERSION` in `config/initializers/app_constants.rb`
           
           ## APK Details
           - Version: ${{ steps.version.outputs.version_name }}
