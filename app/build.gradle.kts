@@ -1,35 +1,34 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.1.20"
 }
 
 android {
     namespace = "me.paolino.clusterheadachetracker"
-    compileSdk = 35
+    compileSdk = 36
 
     buildFeatures {
         buildConfig = true
-        compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.25"
     }
 
     defaultConfig {
         applicationId = "me.paolino.clusterheadachetracker"
         minSdk = 28
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 12
         versionName = "2.0.0"
+        buildConfigField("String", "REMOTE_BASE_URL", "\"https://clusterheadachetracker.com\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL", "\"http://192.168.8.220:3000\"")
+        }
+
         release {
+            buildConfigField("String", "BASE_URL", "\"https://clusterheadachetracker.com\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -38,12 +37,14 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
+
+    kotlin {
+        jvmToolchain(17)
     }
 }
 
@@ -53,15 +54,10 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    implementation("dev.hotwire:core:1.2.0")
-    implementation("dev.hotwire:navigation-fragments:1.2.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
-
-    // Compose dependencies
-    implementation("androidx.compose.ui:ui:1.5.4")
-    implementation("androidx.compose.material3:material3:1.1.2")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.5.4")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation("dev.hotwire:core:1.2.7")
+    implementation("dev.hotwire:navigation-fragments:1.2.7")
+    implementation("com.github.joemasilotti:bridge-components:v0.13.2")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
