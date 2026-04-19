@@ -2,7 +2,6 @@ package me.paolino.clusterheadachetracker
 
 import android.graphics.Color
 import android.os.Bundle
-import android.view.View
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.content.res.AppCompatResources
@@ -11,7 +10,6 @@ import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.tabs.HotwireBottomNavigationController
 import dev.hotwire.navigation.tabs.HotwireBottomTab
 import dev.hotwire.navigation.tabs.navigatorConfigurations
-import dev.hotwire.navigation.util.applyDefaultImeWindowInsets
 
 class MainActivity : HotwireActivity() {
     private lateinit var bottomNavigationController: HotwireBottomNavigationController
@@ -29,8 +27,6 @@ class MainActivity : HotwireActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<View>(R.id.root).applyDefaultImeWindowInsets()
-        configureNavigatorInsets()
         configureBottomNavigation()
     }
 
@@ -53,12 +49,6 @@ class MainActivity : HotwireActivity() {
         isAuthenticating = false
         delegate.resetNavigators()
         restoreRealTabSelection()
-    }
-
-    private fun configureNavigatorInsets() {
-        MainTabs.all.forEach { tab ->
-            findViewById<View>(tab.configuration.navigatorHostId).applyDefaultImeWindowInsets()
-        }
     }
 
     private fun configureBottomNavigation() {
