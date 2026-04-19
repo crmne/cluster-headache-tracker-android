@@ -1,7 +1,9 @@
 package me.paolino.clusterheadachetracker
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.content.res.AppCompatResources
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -11,15 +13,19 @@ import dev.hotwire.navigation.tabs.HotwireBottomTab
 import dev.hotwire.navigation.tabs.navigatorConfigurations
 import dev.hotwire.navigation.util.applyDefaultImeWindowInsets
 
-class MainActivity : HotwireActivity(), AuthenticationCoordinator {
+class MainActivity : HotwireActivity() {
     private lateinit var bottomNavigationController: HotwireBottomNavigationController
     private lateinit var bottomNavigationView: BottomNavigationView
 
-    private var lastSelectedRealTabIndex = MainTabs.defaultIndex
+    private var lastSelectedRealTabIndex = MainTabs.DEFAULT_INDEX
     private var suppressTabSelectionListener = false
+    private var isAuthenticating = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+        )
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -30,18 +36,23 @@ class MainActivity : HotwireActivity(), AuthenticationCoordinator {
 
     override fun navigatorConfigurations() = MainTabs.all.navigatorConfigurations
 
-    override fun onAuthenticationRequired() {
-        if (AppRoutes.isAuthenticationLocation(delegate.currentNavigator?.currentDestination?.location)) {
-            return
-        }
-
-        resetShell {
-            routeOnCurrentNavigator(AppRoutes.signInUrl)
-        }
+    fun presentAuthentication() {
+        if (isAuthenticating) return
+        isAuthenticating = true
+        delegate.currentNavigator?.route(AppRoutes.signInUrl)
     }
 
-    override fun onAuthenticationSucceeded() {
-        resetShell()
+    fun signOut() {
+        recreate()
+    }
+
+    fun checkAuthenticationCompleted(location: String) {
+        if (!isAuthenticating) return
+        if (AppRoutes.isAuthenticationLocation(location)) return
+
+        isAuthenticating = false
+        delegate.resetNavigators()
+        restoreRealTabSelection()
     }
 
     private fun configureNavigatorInsets() {
@@ -58,58 +69,31 @@ class MainActivity : HotwireActivity(), AuthenticationCoordinator {
             AppCompatResources.getColorStateList(this, R.color.bottom_nav_color)
 
         bottomNavigationController = HotwireBottomNavigationController(this, bottomNavigationView)
-        bottomNavigationController.load(MainTabs.all, MainTabs.defaultIndex)
+        bottomNavigationController.load(MainTabs.all, MainTabs.DEFAULT_INDEX)
         bottomNavigationController.setOnTabSelectedListener(::onTabSelected)
     }
 
     private fun onTabSelected(index: Int, @Suppress("UNUSED_PARAMETER") tab: HotwireBottomTab) {
-        if (suppressTabSelectionListener) {
-            return
-        }
+        if (suppressTabSelectionListener) return
 
         if (MainTabs.isActionTab(index)) {
             restoreRealTabSelection()
-            routeOnCurrentNavigator(AppRoutes.newHeadacheLogUrl)
+            delegate.currentNavigator?.route(AppRoutes.newHeadacheLogUrl)
             return
         }
 
         lastSelectedRealTabIndex = index
     }
 
-    private fun resetShell(afterReset: (() -> Unit)? = null) {
-        delegate.resetNavigators()
-        restoreRealTabSelection()
-
-        afterReset?.let { action ->
-            window.decorView.post { action() }
-        }
-    }
-
     private fun restoreRealTabSelection() {
         suppressTabSelectionListener = true
-        bottomNavigationController.selectTab(validRealTabIndex())
+        bottomNavigationController.selectTab(
+            if (MainTabs.isActionTab(lastSelectedRealTabIndex)) {
+                MainTabs.DEFAULT_INDEX
+            } else {
+                lastSelectedRealTabIndex
+            },
+        )
         suppressTabSelectionListener = false
-    }
-
-    private fun routeOnCurrentNavigator(location: String, attempt: Int = 0) {
-        val navigator = delegate.currentNavigator
-        if (navigator != null) {
-            navigator.route(location)
-            return
-        }
-
-        if (attempt < 5) {
-            window.decorView.post {
-                routeOnCurrentNavigator(location, attempt + 1)
-            }
-        }
-    }
-
-    private fun validRealTabIndex(): Int {
-        return if (MainTabs.isActionTab(lastSelectedRealTabIndex)) {
-            MainTabs.defaultIndex
-        } else {
-            lastSelectedRealTabIndex
-        }
     }
 }

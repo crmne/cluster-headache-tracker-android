@@ -4,16 +4,13 @@ import android.app.Application
 import android.webkit.CookieManager
 import androidx.core.content.pm.PackageInfoCompat
 import com.masilotti.bridgecomponents.shared.Bridgework
-import dev.hotwire.core.bridge.BridgeComponent
-import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.KotlinXJsonConverter
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.turbo.config.PathConfiguration
 import dev.hotwire.navigation.config.defaultFragmentDestination
 import dev.hotwire.navigation.config.registerBridgeComponents
-import dev.hotwire.navigation.destinations.HotwireDestination
 import dev.hotwire.navigation.config.registerFragmentDestinations
-import me.paolino.clusterheadachetracker.bridge.PrintComponent
+import me.paolino.clusterheadachetracker.bridge.AppButtonComponent
 import me.paolino.clusterheadachetracker.fragments.WebFragment
 import me.paolino.clusterheadachetracker.fragments.WebModalFragment
 
@@ -21,15 +18,8 @@ class ClusterHeadacheTrackerApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        configureCookies()
+        CookieManager.getInstance().setAcceptCookie(true)
         configureHotwire()
-    }
-
-    private fun configureCookies() {
-        CookieManager.getInstance().apply {
-            setAcceptCookie(true)
-            flush()
-        }
     }
 
     private fun configureHotwire() {
@@ -42,7 +32,7 @@ class ClusterHeadacheTrackerApplication : Application() {
             context = this,
             location = PathConfiguration.Location(
                 assetFilePath = "json/path-configuration.json",
-                remoteFileUrl = "${AppConfig.remoteBaseUrl}/configurations/android_v2.json",
+                remoteFileUrl = "${AppConfig.BASE_URL}/configurations/android_v2.json",
             ),
         )
 
@@ -51,7 +41,13 @@ class ClusterHeadacheTrackerApplication : Application() {
             WebFragment::class,
             WebModalFragment::class,
         )
-        Hotwire.registerBridgeComponents(*registeredBridgeComponents())
+        @Suppress("SpreadOperator")
+        Hotwire.registerBridgeComponents(
+            *Bridgework.coreComponents
+                .filter { it.name != "button" }
+                .plus(AppButtonComponent.factory)
+                .toTypedArray(),
+        )
     }
 
     private fun buildUserAgentPrefix(): String {
@@ -59,10 +55,5 @@ class ClusterHeadacheTrackerApplication : Application() {
         val versionName = packageInfo.versionName
         val versionCode = PackageInfoCompat.getLongVersionCode(packageInfo)
         return "ClusterHeadacheTracker/$versionName.$versionCode;"
-    }
-
-    private fun registeredBridgeComponents(): Array<BridgeComponentFactory<HotwireDestination, BridgeComponent<HotwireDestination>>> {
-        return Bridgework.coreComponents
-            .plus(PrintComponent.factory)
     }
 }

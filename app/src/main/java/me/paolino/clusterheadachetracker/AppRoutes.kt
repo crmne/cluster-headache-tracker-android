@@ -3,7 +3,12 @@ package me.paolino.clusterheadachetracker
 import android.net.Uri
 
 object AppRoutes {
-    private const val recedeHistoricalPath = "/recede_historical_location"
+    val logsUrl = "${AppConfig.BASE_URL}/headache_logs"
+    val chartsUrl = "${AppConfig.BASE_URL}/charts"
+    val newHeadacheLogUrl = "${AppConfig.BASE_URL}/headache_logs/new"
+    val accountUrl = "${AppConfig.BASE_URL}/settings"
+    val feedbackUrl = "${AppConfig.BASE_URL}/feedback"
+    val signInUrl = "${AppConfig.BASE_URL}/users/sign_in"
 
     private val authenticationPaths = setOf(
         "/users/sign_in",
@@ -14,27 +19,10 @@ object AppRoutes {
         "/login",
         "/signup",
         "/register",
-        "/sessions/new",
-        "/session",
     )
 
-    val logsUrl: String = "${AppConfig.baseUrl}/headache_logs"
-    val chartsUrl: String = "${AppConfig.baseUrl}/charts"
-    val newHeadacheLogUrl: String = "${AppConfig.baseUrl}/headache_logs/new"
-    val accountUrl: String = "${AppConfig.baseUrl}/settings"
-    val feedbackUrl: String = "${AppConfig.baseUrl}/feedback"
-    val signInUrl: String = "${AppConfig.baseUrl}/users/sign_in"
-
     fun isAuthenticationLocation(location: String?): Boolean {
-        val path = location?.path() ?: return false
+        val path = location?.let { runCatching { Uri.parse(it).path }.getOrNull() }
         return path in authenticationPaths
     }
-
-    fun didCompleteAuthentication(location: String, previousLocation: String?): Boolean {
-        val path = location.path()
-        return path == recedeHistoricalPath ||
-            (isAuthenticationLocation(previousLocation) && !isAuthenticationLocation(location))
-    }
-
-    private fun String.path(): String? = runCatching { Uri.parse(this).path }.getOrNull()
 }

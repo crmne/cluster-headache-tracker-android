@@ -1,13 +1,40 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Base.Theme.ClusterHeadacheTracker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">#4f46e5</item>
-        <item name="colorPrimaryVariant">#3730a3</item>
+        <item name="colorPrimary">#6366f1</item>
+        <item name="colorPrimaryVariant">#4f46e5</item>
         <item name="colorOnPrimary">@android:color/white</item>
-        <item name="colorSecondary">#4f46e5</item>
-        <item name="colorSecondaryVariant">#3730a3</item>
+        <item name="colorSecondary">#6366f1</item>
+        <item name="colorSecondaryVariant">#4f46e5</item>
         <item name="colorOnSecondary">@android:color/white</item>
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <item name="actionBarStyle">@style/Widget.ClusterHeadacheTracker.ActionBar</item>
+        <item name="android:windowBackground">#111827</item>
         <item name="bottomSheetDialogTheme">@style/Theme.ClusterHeadacheTracker.ModalBottomSheet</item>
+        <item name="toolbarStyle">@style/Widget.ClusterHeadacheTracker.Toolbar</item>
+        <item name="appBarLayoutStyle">@style/Widget.ClusterHeadacheTracker.AppBarLayout</item>
+    </style>
+
+    <style name="Widget.ClusterHeadacheTracker.AppBarLayout" parent="Widget.MaterialComponents.AppBarLayout.Primary">
+        <item name="android:background">#111827</item>
+        <item name="elevation">0dp</item>
+    </style>
+
+    <style name="Widget.ClusterHeadacheTracker.Toolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">#111827</item>
+        <item name="titleTextColor">#ffffff</item>
+        <item name="navigationIconTint">#ffffff</item>
+    </style>
+
+    <style name="Theme.ClusterHeadacheTracker.ModalBottomSheet" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.ClusterHeadacheTracker.BottomSheet.Modal</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">#111827</item>
+    </style>
+
+    <style name="Widget.ClusterHeadacheTracker.BottomSheet.Modal" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="android:layout_margin">0dp</item>
+        <item name="android:layout_marginTop">24dp</item>
+        <item name="behavior_fitToContents">false</item>
+        <item name="behavior_expandedOffset">0dp</item>
+        <item name="behavior_skipCollapsed">true</item>
     </style>
 </resources>

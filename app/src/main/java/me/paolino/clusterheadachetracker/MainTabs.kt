@@ -4,12 +4,12 @@ import dev.hotwire.navigation.navigator.NavigatorConfiguration
 import dev.hotwire.navigation.tabs.HotwireBottomTab
 
 object MainTabs {
-    const val logsIndex = 0
-    const val chartsIndex = 1
-    const val newIndex = 2
-    const val accountIndex = 3
-    const val feedbackIndex = 4
-    const val defaultIndex = logsIndex
+    const val LOGS_INDEX = 0
+    const val CHARTS_INDEX = 1
+    const val NEW_INDEX = 2
+    const val ACCOUNT_INDEX = 3
+    const val FEEDBACK_INDEX = 4
+    const val DEFAULT_INDEX = LOGS_INDEX
 
     val all = listOf(
         HotwireBottomTab(
@@ -59,5 +59,5 @@ object MainTabs {
         ),
     )
 
-    fun isActionTab(index: Int): Boolean = index == newIndex
+    fun isActionTab(index: Int): Boolean = index == NEW_INDEX
 }

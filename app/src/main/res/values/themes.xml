@@ -6,27 +6,29 @@
         <item name="colorSecondary">#4f46e5</item>
         <item name="colorSecondaryVariant">#3730a3</item>
         <item name="colorOnSecondary">@android:color/white</item>
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <item name="actionBarStyle">@style/Widget.ClusterHeadacheTracker.ActionBar</item>
+        <item name="android:windowBackground">#ffffff</item>
         <item name="bottomSheetDialogTheme">@style/Theme.ClusterHeadacheTracker.ModalBottomSheet</item>
+        <item name="toolbarStyle">@style/Widget.ClusterHeadacheTracker.Toolbar</item>
+        <item name="appBarLayoutStyle">@style/Widget.ClusterHeadacheTracker.AppBarLayout</item>
     </style>
 
     <style name="Theme.ClusterHeadacheTracker" parent="Base.Theme.ClusterHeadacheTracker" />
 
-    <style name="Widget.ClusterHeadacheTracker.ActionBar" parent="Widget.MaterialComponents.ActionBar.Primary">
-        <item name="background">?attr/colorPrimary</item>
-        <item name="titleTextStyle">@style/Widget.ClusterHeadacheTracker.ActionBar.TitleText</item>
+    <style name="Widget.ClusterHeadacheTracker.AppBarLayout" parent="Widget.MaterialComponents.AppBarLayout.Primary">
+        <item name="android:background">#ffffff</item>
+        <item name="elevation">0dp</item>
     </style>
 
-    <style name="Widget.ClusterHeadacheTracker.ActionBar.TitleText" parent="TextAppearance.MaterialComponents.Headline6">
-        <item name="android:textColor">@android:color/white</item>
+    <style name="Widget.ClusterHeadacheTracker.Toolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">#ffffff</item>
+        <item name="titleTextColor">#1f2937</item>
     </style>
 
     <style name="Theme.ClusterHeadacheTracker.ModalBottomSheet" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/Widget.ClusterHeadacheTracker.BottomSheet.Modal</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/white</item>
+        <item name="android:navigationBarColor">#ffffff</item>
     </style>
 
     <style name="Widget.ClusterHeadacheTracker.BottomSheet.Modal" parent="Widget.MaterialComponents.BottomSheet.Modal">
