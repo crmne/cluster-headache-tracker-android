@@ -54,6 +54,6 @@ class ClusterHeadacheTrackerApplication : Application() {
         val packageInfo = packageManager.getPackageInfo(packageName, 0)
         val versionName = packageInfo.versionName
         val versionCode = PackageInfoCompat.getLongVersionCode(packageInfo)
-        return "ClusterHeadacheTracker/$versionName.$versionCode;"
+        return "ClusterHeadacheTracker; platform=android; version=$versionName; build=$versionCode;"
     }
 }

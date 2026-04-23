@@ -22,11 +22,21 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
+    - name: Derive release version
+      id: version
+      run: |
+        version_name="${GITHUB_REF_NAME#v}"
+        IFS='.' read -r major minor patch <<< "$version_name"
+        version_code=$((major * 10000 + minor * 100 + patch))
+
+        echo "version_name=$version_name" >> "$GITHUB_OUTPUT"
+        echo "version_code=$version_code" >> "$GITHUB_OUTPUT"
+
     - name: Build debug APK
-      run: ./gradlew assembleDebug
+      run: ./gradlew assembleDebug -PreleaseVersionName="${{ steps.version.outputs.version_name }}" -PreleaseVersionCode="${{ steps.version.outputs.version_code }}"
 
     - name: Build release APK
-      run: ./gradlew assembleRelease
+      run: ./gradlew assembleRelease -PreleaseVersionName="${{ steps.version.outputs.version_name }}" -PreleaseVersionCode="${{ steps.version.outputs.version_code }}"
 
     - name: Rename APKs
       run: |

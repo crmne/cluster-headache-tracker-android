@@ -12,6 +12,12 @@ The main reason for creating this Android app is to increase accessibility and v
 - 📊 View and interact with headache logs and charts
 - 🔒 Secure authentication and data storage (handled by the web app)
 
+## 🔢 Versioning
+
+- Local builds fall back to the checked-in app version in `app/build.gradle.kts`
+- Tag releases derive `versionName` from the Git tag and `versionCode` from semver
+- Example: `v2.1.1` builds as `versionName=2.1.1` and `versionCode=20101`
+
 ## 🛠 Requirements
 
 - Android 9 (API level 28)

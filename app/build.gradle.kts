@@ -4,6 +4,14 @@ plugins {
     kotlin("plugin.serialization") version libs.versions.kotlin.get()
 }
 
+val appVersionName = providers.gradleProperty("releaseVersionName").orElse("2.1.1").get()
+val appVersionCode =
+    providers
+        .gradleProperty("releaseVersionCode")
+        .orElse("20101")
+        .get()
+        .toInt()
+
 android {
     namespace = "me.paolino.clusterheadachetracker"
     compileSdk = 36
@@ -16,8 +24,8 @@ android {
         applicationId = "me.paolino.clusterheadachetracker"
         minSdk = 28
         targetSdk = 36
-        versionCode = 12
-        versionName = "2.0.0"
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
