@@ -8,6 +8,7 @@ import org.junit.Test
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
+import java.util.Locale
 
 class WidgetSnapshotTest {
     private val zone = ZoneId.of("Europe/Berlin")
@@ -46,6 +47,27 @@ class WidgetSnapshotTest {
 
         assertTrue(snapshot.ongoing)
         assertEquals(Duration.ofMinutes(25), snapshot.elapsed(Instant.parse("2026-10-02T08:25:00Z")))
+    }
+
+    @Test
+    fun patientOffsetTimesGiveTheRightElapsedTimeAndLocalStartTime() {
+        val snapshot = snapshot(WidgetStatus(ongoing = true, startedAt = "2026-10-02T11:44:00+02:00"))
+        val startedAt = snapshot.startedAt!!
+
+        assertEquals(Instant.parse("2026-10-02T09:44:00Z"), startedAt)
+        assertEquals(Duration.ofMinutes(76), snapshot.elapsed(Instant.parse("2026-10-02T11:00:00Z")))
+        assertEquals("11:44", WidgetSnapshot.formatTime(startedAt, zone, use24Hour = true, Locale.GERMAN))
+        assertEquals(
+            "5:44 AM",
+            WidgetSnapshot.formatTime(startedAt, ZoneId.of("America/New_York"), use24Hour = false, Locale.US),
+        )
+    }
+
+    @Test
+    fun utcTimesFromAFreshInstallStillParse() {
+        val snapshot = snapshot(WidgetStatus(ongoing = true, startedAt = "2026-10-02T09:44:00Z"))
+
+        assertEquals(Instant.parse("2026-10-02T09:44:00Z"), snapshot.startedAt)
     }
 
     @Test

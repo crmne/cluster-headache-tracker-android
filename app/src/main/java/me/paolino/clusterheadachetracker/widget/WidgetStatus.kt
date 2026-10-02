@@ -6,7 +6,9 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 /**
  * Payload of the `widget-status` bridge component's `connect` event, as fixed by the web/native contract:
@@ -49,8 +51,13 @@ data class WidgetSnapshot(val status: WidgetStatus, val receivedAt: Instant) {
     companion object {
         val SUPPORTED_LOCALES = setOf("en", "de", "it", "es")
 
+        /** Accepts any ISO 8601 offset: the patient's own (`+02:00`) or `Z` on a fresh install's first load. */
         fun parseInstant(value: String?): Instant? =
             value?.let { runCatching { OffsetDateTime.parse(it).toInstant() }.getOrNull() }
+
+        /** A wall-clock time in the device's zone, following its 12/24-hour setting. */
+        fun formatTime(instant: Instant, zone: ZoneId, use24Hour: Boolean, locale: Locale): String =
+            DateTimeFormatter.ofPattern(if (use24Hour) "HH:mm" else "h:mm a", locale).format(instant.atZone(zone))
 
         private fun localDate(instant: Instant, zone: ZoneId): LocalDate = instant.atZone(zone).toLocalDate()
     }

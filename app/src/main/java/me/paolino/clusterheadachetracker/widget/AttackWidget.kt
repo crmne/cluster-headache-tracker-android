@@ -43,7 +43,6 @@ import me.paolino.clusterheadachetracker.DeepLinks
 import me.paolino.clusterheadachetracker.R
 import java.time.Instant
 import java.time.ZoneId
-import java.util.Date
 
 /**
  * Home-screen widget: a live timer while an attack is ongoing, otherwise days attack-free, with one-tap
@@ -103,7 +102,12 @@ private fun OngoingAttack(context: Context, snapshot: WidgetSnapshot, now: Insta
         AndroidRemoteViews(timer, modifier = GlanceModifier.wrapContentSize())
     }
     snapshot.startedAt?.let { startedAt ->
-        val time = DateFormat.getTimeFormat(context).format(Date.from(startedAt))
+        val time = WidgetSnapshot.formatTime(
+            startedAt,
+            ZoneId.systemDefault(),
+            DateFormat.is24HourFormat(context),
+            context.resources.configuration.locales[0],
+        )
         Caption(context.getString(R.string.widget_started_at, time))
     }
 }
