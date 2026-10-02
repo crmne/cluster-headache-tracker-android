@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="log_attack"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_log_attack"
+        android:shortcutShortLabel="@string/shortcut_log_attack_short"
+        android:shortcutLongLabel="@string/shortcut_log_attack_long">
+        <intent
+            android:action="me.paolino.clusterheadachetracker.action.OPEN_PATH"
+            android:targetPackage="me.paolino.clusterheadachetracker"
+            android:targetClass="me.paolino.clusterheadachetracker.MainActivity">
+            <extra android:name="path" android:value="/headache_logs/new?quick=1" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="current_attack"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_current_attack"
+        android:shortcutShortLabel="@string/shortcut_current_attack_short"
+        android:shortcutLongLabel="@string/shortcut_current_attack_long">
+        <intent
+            android:action="me.paolino.clusterheadachetracker.action.OPEN_PATH"
+            android:targetPackage="me.paolino.clusterheadachetracker"
+            android:targetClass="me.paolino.clusterheadachetracker.MainActivity">
+            <extra android:name="path" android:value="/current_attack" />
+        </intent>
+    </shortcut>
+</shortcuts>
