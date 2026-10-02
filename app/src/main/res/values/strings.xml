@@ -1,3 +1,46 @@
 <resources>
-    <string name="app_name">Cluster Headache Tracker</string>
+    <string name="app_name" translatable="false">Cluster Headache Tracker</string>
+
+    <string name="tab_logs">Logs</string>
+    <string name="tab_charts">Charts</string>
+    <string name="tab_new">New</string>
+    <string name="tab_account">Account</string>
+    <string name="tab_feedback">Feedback</string>
+
+    <string name="action_log_attack">Log attack</string>
+    <string name="action_start_attack">Start attack</string>
+    <string name="action_end_attack">End attack</string>
+
+    <string name="shortcut_log_attack_short">Log attack</string>
+    <string name="shortcut_log_attack_long">Log an attack</string>
+    <string name="shortcut_current_attack_short">Current attack</string>
+    <string name="shortcut_current_attack_long">Current attack</string>
+    <string name="shortcut_end_attack_short">End attack</string>
+    <string name="shortcut_end_attack_long">End the ongoing attack</string>
+
+    <string name="widget_name">Attack status</string>
+    <string name="widget_description">Timer for an ongoing attack or days attack-free, with one-tap logging</string>
+    <string name="widget_attack_ongoing">Attack ongoing</string>
+    <string name="widget_started_at">Started at %1$s</string>
+    <string name="widget_no_attacks_logged">No attacks logged yet</string>
+    <string name="widget_open_app_to_sync">Open the app to show your status here</string>
+    <plurals name="widget_days_attack_free">
+        <item quantity="one">%d day attack-free</item>
+        <item quantity="other">%d days attack-free</item>
+    </plurals>
+    <plurals name="widget_days_attack_free_label">
+        <item quantity="one">day attack-free</item>
+        <item quantity="other">days attack-free</item>
+    </plurals>
+    <plurals name="widget_attacks_today">
+        <item quantity="one">%d attack today</item>
+        <item quantity="other">%d attacks today</item>
+    </plurals>
+
+    <string name="widget_preview_days" translatable="false">12</string>
+    <string name="widget_preview_label">days attack-free</string>
+
+    <string name="download_started">Downloading…</string>
+    <string name="download_failed">Download failed. Please try again.</string>
+    <string name="download_share">Share</string>
 </resources>

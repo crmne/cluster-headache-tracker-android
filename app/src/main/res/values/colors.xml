@@ -1,14 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    
-    <!-- Primary brand colors from Rails app -->
-    <color name="primary">#4f46e5</color>
-    <color name="primary_dark">#3730a3</color>
-    <color name="primary_light">#6366f1</color>
-    
-    <!-- Bottom navigation colors -->
-    <color name="bottom_nav_selected">@color/primary</color>
-    <color name="bottom_nav_unselected">#9ca3af</color>
+    <!-- Brand scheme (indigo, matching the web app). Used where dynamic color isn't available (Android 11 and
+         older); on Android 12+ Material You colors from the wallpaper take over. -->
+    <color name="brand_primary">#4F46E5</color>
+    <color name="brand_on_primary">#FFFFFF</color>
+    <color name="brand_primary_container">#E1E0FF</color>
+    <color name="brand_on_primary_container">#100A73</color>
+    <color name="brand_secondary">#5C5D72</color>
+    <color name="brand_on_secondary">#FFFFFF</color>
+    <color name="brand_secondary_container">#E1E0F9</color>
+    <color name="brand_on_secondary_container">#191A2C</color>
+    <color name="brand_tertiary">#78536B</color>
+    <color name="brand_on_tertiary">#FFFFFF</color>
+    <color name="brand_surface">#FCF8FF</color>
+    <color name="brand_on_surface">#1B1B21</color>
+    <color name="brand_surface_variant">#E4E1EC</color>
+    <color name="brand_on_surface_variant">#46464F</color>
+    <color name="brand_surface_container_lowest">#FFFFFF</color>
+    <color name="brand_surface_container_low">#F6F2FA</color>
+    <color name="brand_surface_container">#F0ECF4</color>
+    <color name="brand_surface_container_high">#EAE7EF</color>
+    <color name="brand_surface_container_highest">#E4E1E9</color>
+    <color name="brand_outline">#777680</color>
+    <color name="brand_outline_variant">#C7C5D0</color>
+
+    <!-- Widget text drawn through RemoteViews (the live timer), resolved by the launcher in light or dark. -->
+    <color name="widget_on_surface">@color/brand_on_surface</color>
+
+    <color name="splash_background">#2B3858</color>
 </resources>

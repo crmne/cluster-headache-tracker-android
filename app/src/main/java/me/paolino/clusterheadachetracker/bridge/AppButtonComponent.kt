@@ -1,11 +1,11 @@
 package me.paolino.clusterheadachetracker.bridge
 
 import android.content.Intent
-import android.net.Uri
 import android.print.PrintManager
 import android.view.Menu
 import android.view.MenuItem
 import android.webkit.CookieManager
+import androidx.core.net.toUri
 import dev.hotwire.core.bridge.BridgeComponent
 import dev.hotwire.core.bridge.BridgeComponentFactory
 import dev.hotwire.core.bridge.BridgeDelegate
@@ -15,6 +15,8 @@ import dev.hotwire.navigation.fragments.HotwireFragment
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.paolino.clusterheadachetracker.MainActivity
+import me.paolino.clusterheadachetracker.R
+import me.paolino.clusterheadachetracker.widget.WidgetUpdates
 
 class AppButtonComponent(name: String, private val bridgeDelegate: BridgeDelegate<HotwireDestination>) :
     BridgeComponent<HotwireDestination>(name, bridgeDelegate) {
@@ -29,7 +31,7 @@ class AppButtonComponent(name: String, private val bridgeDelegate: BridgeDelegat
 
     override fun onReceive(message: Message) {
         when (message.event) {
-            "connect", "right" -> addButton(message)
+            "connect", "left", "right" -> addButton(message)
             "disconnect" -> removeButton()
         }
     }
@@ -40,7 +42,10 @@ class AppButtonComponent(name: String, private val bridgeDelegate: BridgeDelegat
 
         removeButton()
         toolbar.menu.add(0, MENU_ITEM_ID, Menu.NONE, data.title).apply {
-            setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+            // Material icon when we know the requested `androidImage`; the title stays as its accessibility label.
+            iconFor(data.imageName)?.let { setIcon(it) }
+            contentDescription = data.title
             setOnMenuItemClickListener {
                 handleTap(data, message.event)
                 true
@@ -48,20 +53,28 @@ class AppButtonComponent(name: String, private val bridgeDelegate: BridgeDelegat
         }
     }
 
+    private fun iconFor(imageName: String?): Int? = when (imageName) {
+        "add" -> R.drawable.ic_toolbar_add
+        "print" -> R.drawable.ic_toolbar_print
+        "logout" -> R.drawable.ic_toolbar_logout
+        else -> null
+    }
+
     private fun handleTap(data: MessageData, event: String) {
-        when (data.title) {
-            "Print" -> {
+        when (data.action) {
+            Action.PRINT -> {
                 replyTo(event)
                 printCurrentPage()
             }
-            "Sign Out" -> {
+
+            Action.SIGN_OUT -> {
                 replyTo(event)
                 signOut()
             }
-            "Sponsor" -> {
-                openExternally("https://github.com/sponsors/crmne")
-            }
-            else -> replyTo(event)
+
+            Action.SPONSOR -> openExternally("https://github.com/sponsors/crmne")
+
+            Action.DEFAULT -> replyTo(event)
         }
     }
 
@@ -73,6 +86,7 @@ class AppButtonComponent(name: String, private val bridgeDelegate: BridgeDelegat
     }
 
     private fun signOut() {
+        WidgetUpdates.clear(fragment.requireContext())
         CookieManager.getInstance().removeAllCookies(null)
         CookieManager.getInstance().flush()
 
@@ -83,17 +97,31 @@ class AppButtonComponent(name: String, private val bridgeDelegate: BridgeDelegat
     }
 
     private fun openExternally(url: String) {
-        fragment.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        fragment.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
     }
 
     private fun removeButton() {
         fragment.toolbarForNavigation()?.menu?.removeItem(MENU_ITEM_ID)
     }
 
+    enum class Action { PRINT, SIGN_OUT, SPONSOR, DEFAULT }
+
     @Serializable
     data class MessageData(
         val title: String,
-        @SerialName("androidImage") val imageName: String?,
-        @SerialName("color") val colorCode: String?,
-    )
+        @SerialName("androidImage") val imageName: String? = null,
+        @SerialName("color") val colorCode: String? = null,
+    ) {
+        /**
+         * Titles get translated as the web app becomes multilingual, so the Material Symbols name
+         * (`data-bridge-android-image`) wins; English titles remain as a fallback for older pages.
+         */
+        val action: Action
+            get() = when {
+                imageName == "print" || title == "Print" -> Action.PRINT
+                imageName == "logout" || title == "Sign Out" -> Action.SIGN_OUT
+                title == "Sponsor" -> Action.SPONSOR
+                else -> Action.DEFAULT
+            }
+    }
 }
