@@ -1,0 +1,46 @@
+<resources>
+    <string name="tab_logs">Registros</string>
+    <string name="tab_charts">Gráficos</string>
+    <string name="tab_new">Nuevo</string>
+    <string name="tab_account">Cuenta</string>
+    <string name="tab_feedback">Opiniones</string>
+
+    <string name="action_log_attack">Registrar crisis</string>
+    <string name="action_start_attack">Iniciar crisis</string>
+    <string name="action_end_attack">Terminar crisis</string>
+
+    <string name="shortcut_log_attack_short">Registrar crisis</string>
+    <string name="shortcut_log_attack_long">Registrar una crisis</string>
+    <string name="shortcut_current_attack_short">Crisis actual</string>
+    <string name="shortcut_current_attack_long">Crisis actual</string>
+    <string name="shortcut_end_attack_short">Terminar crisis</string>
+    <string name="shortcut_end_attack_long">Terminar la crisis en curso</string>
+
+    <string name="widget_name">Estado de crisis</string>
+    <string name="widget_description">Temporizador de la crisis en curso o días sin crisis, con registro en un toque</string>
+    <string name="widget_attack_ongoing">Crisis en curso</string>
+    <string name="widget_started_at">Empezó a las %1$s</string>
+    <string name="widget_no_attacks_logged">Aún no hay crisis registradas</string>
+    <string name="widget_open_app_to_sync">Abre la app para ver tu estado aquí</string>
+    <plurals name="widget_days_attack_free">
+        <item quantity="one">%d día sin crisis</item>
+        <item quantity="many">%d días sin crisis</item>
+        <item quantity="other">%d días sin crisis</item>
+    </plurals>
+    <plurals name="widget_days_attack_free_label">
+        <item quantity="one">día sin crisis</item>
+        <item quantity="many">días sin crisis</item>
+        <item quantity="other">días sin crisis</item>
+    </plurals>
+    <plurals name="widget_attacks_today">
+        <item quantity="one">%d crisis hoy</item>
+        <item quantity="many">%d crisis hoy</item>
+        <item quantity="other">%d crisis hoy</item>
+    </plurals>
+
+    <string name="widget_preview_label">días sin crisis</string>
+
+    <string name="download_started">Descargando…</string>
+    <string name="download_failed">No se pudo descargar. Inténtalo de nuevo.</string>
+    <string name="download_share">Compartir</string>
+</resources>

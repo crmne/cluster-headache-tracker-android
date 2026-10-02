@@ -1,0 +1,46 @@
+<resources>
+    <string name="tab_logs">Diario</string>
+    <string name="tab_charts">Grafici</string>
+    <string name="tab_new">Nuovo</string>
+    <string name="tab_account">Account</string>
+    <string name="tab_feedback">Feedback</string>
+
+    <string name="action_log_attack">Registra attacco</string>
+    <string name="action_start_attack">Inizia attacco</string>
+    <string name="action_end_attack">Termina attacco</string>
+
+    <string name="shortcut_log_attack_short">Registra attacco</string>
+    <string name="shortcut_log_attack_long">Registra un attacco</string>
+    <string name="shortcut_current_attack_short">Attacco in corso</string>
+    <string name="shortcut_current_attack_long">Attacco in corso</string>
+    <string name="shortcut_end_attack_short">Termina attacco</string>
+    <string name="shortcut_end_attack_long">Termina l\'attacco in corso</string>
+
+    <string name="widget_name">Stato attacchi</string>
+    <string name="widget_description">Timer dell\'attacco in corso o giorni senza attacchi, con registrazione in un tocco</string>
+    <string name="widget_attack_ongoing">Attacco in corso</string>
+    <string name="widget_started_at">Iniziato alle %1$s</string>
+    <string name="widget_no_attacks_logged">Nessun attacco registrato</string>
+    <string name="widget_open_app_to_sync">Apri l\'app per vedere qui il tuo stato</string>
+    <plurals name="widget_days_attack_free">
+        <item quantity="one">%d giorno senza attacchi</item>
+        <item quantity="many">%d giorni senza attacchi</item>
+        <item quantity="other">%d giorni senza attacchi</item>
+    </plurals>
+    <plurals name="widget_days_attack_free_label">
+        <item quantity="one">giorno senza attacchi</item>
+        <item quantity="many">giorni senza attacchi</item>
+        <item quantity="other">giorni senza attacchi</item>
+    </plurals>
+    <plurals name="widget_attacks_today">
+        <item quantity="one">%d attacco oggi</item>
+        <item quantity="many">%d attacchi oggi</item>
+        <item quantity="other">%d attacchi oggi</item>
+    </plurals>
+
+    <string name="widget_preview_label">giorni senza attacchi</string>
+
+    <string name="download_started">Download in corso…</string>
+    <string name="download_failed">Download non riuscito. Riprova.</string>
+    <string name="download_share">Condividi</string>
+</resources>

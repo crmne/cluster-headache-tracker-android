@@ -1,32 +1,52 @@
 [versions]
-activity = "1.11.0"
-agp = "8.13.2"
-appcompat = "1.7.1"
-constraintlayout = "2.2.1"
-coreKtx = "1.17.0"
-detekt = "1.23.6"
+activity = "1.13.0"
+agp = "9.4.1"
+appcompat = "1.8.0"
+bridgeComponents = "v0.14.0"
+constraintlayout = "2.2.2"
+coreKtx = "1.19.1"
+coreSplashscreen = "1.2.0"
+detekt = "1.23.8"
 espressoCore = "3.7.0"
+glance = "1.2.0"
+hotwire = "1.3.1"
 junit = "4.13.2"
 junitVersion = "1.3.0"
-ktlint = "1.3.1"
-kotlin = "2.3.0"
-lifecycle = "2.9.4"
-material = "1.13.0"
-spotless = "6.25.0"
+kotlin = "2.4.20"
+kotlinxSerialization = "1.11.0"
+ktlint = "1.8.0"
+lifecycle = "2.11.0"
+material = "1.14.0"
+spotless = "8.10.3"
+testCore = "1.7.0"
+testRunner = "1.7.0"
+uiautomator = "2.4.0"
 
 [libraries]
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
+androidx-glance-material3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glance" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
+androidx-test-core = { group = "androidx.test", name = "core-ktx", version.ref = "testCore" }
+androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "testRunner" }
+androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
+bridge-components = { group = "com.github.joemasilotti", name = "bridge-components", version.ref = "bridgeComponents" }
+hotwire-core = { group = "dev.hotwire", name = "core", version.ref = "hotwire" }
+hotwire-navigation-fragments = { group = "dev.hotwire", name = "navigation-fragments", version.ref = "hotwire" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

@@ -4,106 +4,47 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a Hotwire Native Android app that wraps the Cluster Headache Tracker web application. It provides a native Android shell for the web app at https://clusterheadachetracker.com, making it easier for users to access through the Google Play Store rather than installing a PWA.
+Hotwire Native Android shell for the Cluster Headache Tracker web app (https://clusterheadachetracker.com). The web app renders every screen; the shell adds native tabs, modals, bridge components, a home-screen widget, app shortcuts and file handling.
 
-## Build and Development Commands
+## Toolchain
 
-### Building the App
+- JDK: use Android Studio's bundled JBR (`export JAVA_HOME=/opt/android-studio/jbr`). AGP doesn't run on newer system JDKs.
+- Android SDK at `~/Android/Sdk` (`local.properties`), compile/target SDK 37, build-tools 37.
+- Gradle 9.8 wrapper, AGP 9.4 (built-in Kotlin), Kotlin 2.4, Hotwire Native 1.3.1, Joe Masilotti's bridge-components v0.14.0 (JitPack).
+- minSdk 28 (Android 9).
+
+## Commands
+
 ```bash
-# Build debug APK
-./gradlew assembleDebug
-
-# Build release APK
-./gradlew assembleRelease
-
-# Install debug build on connected device
-./gradlew installDebug
-
-# Clean build artifacts
-./gradlew clean
+./gradlew assembleDebug                         # Debug APK against production
+./gradlew installDebug -PbaseUrl=http://localhost:3078   # Point a build at a local Rails server
+./gradlew testDebugUnitTest                     # JVM unit tests
+./gradlew connectedDebugAndroidTest             # Espresso + UI Automator tests on a device/emulator
+./gradlew lintDebug detekt spotlessCheck        # Static checks (CI runs these)
+./gradlew spotlessApply                         # Format
 ```
 
-### Running Tests
-```bash
-# Run unit tests
-./gradlew test
-
-# Run instrumented tests (requires device/emulator)
-./gradlew connectedAndroidTest
-
-# Run all tests
-./gradlew check
-```
-
-### Linting and Code Quality
-```bash
-# Run Android Lint
-./gradlew lint
-
-# View lint results after running
-# HTML report: app/build/reports/lint-results-debug.html
-```
+Local server on the emulator: run Rails on a free port, then `adb reverse tcp:3078 tcp:3078` and build with `-PbaseUrl=http://localhost:3078` (debug builds allow cleartext). The WebView can be inspected/driven over CDP: `adb forward tcp:9333 localabstract:webview_devtools_remote_<pid>`.
 
 ## Architecture
 
-### Technology Stack
-- **Hotwire Native 1.2.0**: Web-to-native bridge framework
-- **Kotlin**: Primary development language
-- **Android SDK 34**: Target Android 14 (API 34), minimum Android 9 (API 28)
-- **Gradle 8.9 with Kotlin DSL**: Build system
+- `ClusterHeadacheTrackerApplication`: Hotwire config (logger, user agent prefix `ClusterHeadacheTracker; platform=android; version=…`), path configuration (bundled `assets/json/path-configuration.json`, remote `/configurations/android_v2.json`), fragment destinations, route decision handlers, bridge components, dynamic color.
+- `MainActivity`: splash screen, edge-to-edge, `HotwireBottomNavigationController` with lazy tabs (Logs, Charts, New action tab, Account, Feedback), auth reset, shortcut/widget deep links (`DeepLinks`, action `OPEN_PATH` + `path` extra, resolved by `AppRoutes.urlForPath`).
+- Fragments: `WebFragment` (`hotwire://fragment/web`) and `WebModalFragment` (`hotwire://fragment/web/modal`, full-screen in the modal context so library bridge components find a `HotwireFragment` toolbar). Both handle 401 → sign-in and attach the download listener.
+- Bridge components: Joe's core set (alert, form, haptic, menu, review-prompt, search, share, theme, toast), our `button` (`AppButtonComponent`: native print, sign-out and sponsor, decided by `nativeAction`, falling back to `androidImage` and the English title for older servers), `download` (PDF reports), `widget-status` (stores the payload for the widget/shortcuts).
+- Downloads (`downloads/`): same-host `.pdf`/`.csv` and WebView downloads are fetched with the WebView cookies into `cacheDir/downloads` and opened via FileProvider with a Share option.
+- Widget and shortcuts (`widget/`): Glance `AttackWidget` (live timer while ongoing, days attack-free otherwise), static shortcuts in `res/xml/shortcuts.xml`, dynamic "End attack" shortcut while ongoing. Data only comes from the `widget-status` bridge payload in SharedPreferences (`widget_status`, excluded from backups); widgets never call the server.
+- File uploads (camera + gallery) are handled by Hotwire Native's built-in file chooser.
 
-### Key Components
+## Path configuration
 
-1. **MainActivity** (`app/src/main/java/me/paolino/clusterheadachetracker/MainActivity.kt`):
-   - Extends `HotwireActivity`
-   - Configures Hotwire with local path configuration
-   - Sets start location to `https://clusterheadachetracker.com/headache_logs`
+Rules merge in order, later rules win, and patterns match path plus query string. Keep `.*` first. The bundled copy mirrors the server's `public/configurations/android_v2.json`; `PathConfigurationTest` checks the important outcomes.
 
-2. **Path Configuration** (`app/src/main/assets/json/android_v1.json`):
-   - Defines navigation rules for different URL patterns
-   - Modal presentation for create/edit actions
-   - Fragment navigation for main sections
+## Strings
 
-3. **App Structure**:
-   - Single activity architecture with Hotwire managing navigation
-   - No local data storage - all data handled by web app
-   - Minimal permissions (only INTERNET)
-
-### Important Files
-- `app/build.gradle.kts`: App module configuration with dependencies
-- `gradle/libs.versions.toml`: Centralized version catalog
-- `app/src/main/AndroidManifest.xml`: App manifest with permissions and activity configuration
-
-## Development Notes
-
-1. **Signing**: Release builds currently use debug signing config - update for production release
-2. **ProGuard**: Minification is disabled - consider enabling for production
-3. **Web URL**: 
-   - Debug builds use local server: `http://192.168.8.220:3000`
-   - Release builds use production: `https://clusterheadachetracker.com`
-   - Update IP in `AppConfig.kt` to match your local development server
-4. **Navigation**: All navigation is handled by Hotwire based on web app URLs
-5. **Testing**: Basic test setup exists but no actual tests implemented
-6. **Network Security**: Debug builds allow cleartext HTTP traffic for local development
-
-## Common Tasks
-
-### Updating Hotwire Native
-1. Update versions in `app/build.gradle.kts`
-2. Check for breaking changes in Hotwire Native changelog
-3. Test navigation thoroughly, especially modals
-
-### Changing Web App URL
-1. Update `BASE_URL` in `MainActivity.kt`
-2. Update `startLocation` if the initial route changes
-
-### Adding Native Features
-Since this is a Hotwire wrapper, native features should be minimal. Any native functionality should:
-1. Be added as a bridge component if needed by the web app
-2. Follow Hotwire Native patterns for JavaScript-to-native communication
-
+User-facing strings live in `res/values{,-de,-it,-es}/strings.xml`; add all four languages.
 
 ## Development tips
-- Check the hotwire-native-android code and demo in ~/Code/External/hotwire-native-android/
-- Check the rails app code in ~/Code/Plenty/cluster-headache-tracker/
+- Hotwire Native Android source: https://github.com/hotwired/hotwire-native-android
+- Rails app: ../cluster-headache-tracker
 - Don't overcomplicate things.

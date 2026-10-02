@@ -1,41 +1,59 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Base.Theme.ClusterHeadacheTracker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">#4f46e5</item>
-        <item name="colorPrimaryVariant">#3730a3</item>
-        <item name="colorOnPrimary">@android:color/white</item>
-        <item name="colorSecondary">#4f46e5</item>
-        <item name="colorSecondaryVariant">#3730a3</item>
-        <item name="colorOnSecondary">@android:color/white</item>
-        <item name="android:windowBackground">#ffffff</item>
-        <item name="bottomSheetDialogTheme">@style/Theme.ClusterHeadacheTracker.ModalBottomSheet</item>
-        <item name="toolbarStyle">@style/Widget.ClusterHeadacheTracker.Toolbar</item>
-        <item name="appBarLayoutStyle">@style/Widget.ClusterHeadacheTracker.AppBarLayout</item>
+<resources>
+    <style name="Base.Theme.ClusterHeadacheTracker" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="colorOnPrimary">@color/brand_on_primary</item>
+        <item name="colorPrimaryContainer">@color/brand_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/brand_on_primary_container</item>
+        <item name="colorSecondary">@color/brand_secondary</item>
+        <item name="colorOnSecondary">@color/brand_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/brand_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/brand_on_secondary_container</item>
+        <item name="colorTertiary">@color/brand_tertiary</item>
+        <item name="colorOnTertiary">@color/brand_on_tertiary</item>
+        <item name="android:colorBackground">@color/brand_surface</item>
+        <item name="colorOnBackground">@color/brand_on_surface</item>
+        <item name="colorSurface">@color/brand_surface</item>
+        <item name="colorOnSurface">@color/brand_on_surface</item>
+        <item name="colorSurfaceVariant">@color/brand_surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/brand_on_surface_variant</item>
+        <item name="colorSurfaceContainerLowest">@color/brand_surface_container_lowest</item>
+        <item name="colorSurfaceContainerLow">@color/brand_surface_container_low</item>
+        <item name="colorSurfaceContainer">@color/brand_surface_container</item>
+        <item name="colorSurfaceContainerHigh">@color/brand_surface_container_high</item>
+        <item name="colorSurfaceContainerHighest">@color/brand_surface_container_highest</item>
+        <item name="colorOutline">@color/brand_outline</item>
+        <item name="colorOutlineVariant">@color/brand_outline_variant</item>
+
+        <item name="actionMenuTextAppearance">@style/TextAppearance.ClusterHeadacheTracker.ActionMenu</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.ClusterHeadacheTracker.ModalBottomSheet</item>
+    </style>
+
+    <!-- Toolbar text buttons (e.g. "Sign Out", "Sponsor") in sentence case like the rest of Material 3. -->
+    <style name="TextAppearance.ClusterHeadacheTracker.ActionMenu" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
     </style>
 
     <style name="Theme.ClusterHeadacheTracker" parent="Base.Theme.ClusterHeadacheTracker" />
 
-    <style name="Widget.ClusterHeadacheTracker.AppBarLayout" parent="Widget.MaterialComponents.AppBarLayout.Primary">
-        <item name="android:background">#ffffff</item>
-        <item name="elevation">0dp</item>
+    <!-- Shown by the AndroidX SplashScreen API until the first frame, then swapped for the app theme. -->
+    <style name="Theme.ClusterHeadacheTracker.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.ClusterHeadacheTracker</item>
     </style>
 
-    <style name="Widget.ClusterHeadacheTracker.Toolbar" parent="Widget.MaterialComponents.Toolbar">
-        <item name="android:background">#ffffff</item>
-        <item name="titleTextColor">#1f2937</item>
-    </style>
-
-    <style name="Theme.ClusterHeadacheTracker.ModalBottomSheet" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+    <!-- Hotwire modals: full-height, edge-to-edge bottom sheets that skip the collapsed state. -->
+    <style name="ThemeOverlay.ClusterHeadacheTracker.ModalBottomSheet" parent="ThemeOverlay.Material3.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/Widget.ClusterHeadacheTracker.BottomSheet.Modal</item>
+        <item name="enableEdgeToEdge">true</item>
         <item name="android:windowIsFloating">false</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">#ffffff</item>
     </style>
 
-    <style name="Widget.ClusterHeadacheTracker.BottomSheet.Modal" parent="Widget.MaterialComponents.BottomSheet.Modal">
-        <item name="android:layout_margin">0dp</item>
-        <item name="android:layout_marginTop">24dp</item>
+    <style name="Widget.ClusterHeadacheTracker.BottomSheet.Modal" parent="Widget.Material3.BottomSheet.Modal">
         <item name="behavior_fitToContents">false</item>
         <item name="behavior_expandedOffset">0dp</item>
         <item name="behavior_skipCollapsed">true</item>
+        <item name="paddingBottomSystemWindowInsets">true</item>
     </style>
 </resources>

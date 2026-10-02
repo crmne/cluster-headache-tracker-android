@@ -1,0 +1,43 @@
+<resources>
+    <string name="tab_logs">Einträge</string>
+    <string name="tab_charts">Diagramme</string>
+    <string name="tab_new">Neu</string>
+    <string name="tab_account">Konto</string>
+    <string name="tab_feedback">Feedback</string>
+
+    <string name="action_log_attack">Attacke erfassen</string>
+    <string name="action_start_attack">Attacke starten</string>
+    <string name="action_end_attack">Attacke beenden</string>
+
+    <string name="shortcut_log_attack_short">Attacke erfassen</string>
+    <string name="shortcut_log_attack_long">Eine Attacke erfassen</string>
+    <string name="shortcut_current_attack_short">Aktuelle Attacke</string>
+    <string name="shortcut_current_attack_long">Aktuelle Attacke</string>
+    <string name="shortcut_end_attack_short">Attacke beenden</string>
+    <string name="shortcut_end_attack_long">Laufende Attacke beenden</string>
+
+    <string name="widget_name">Attackenstatus</string>
+    <string name="widget_description">Timer für eine laufende Attacke oder attackenfreie Tage, mit Erfassung per Fingertipp</string>
+    <string name="widget_attack_ongoing">Attacke läuft</string>
+    <string name="widget_started_at">Begonnen um %1$s</string>
+    <string name="widget_no_attacks_logged">Noch keine Attacken erfasst</string>
+    <string name="widget_open_app_to_sync">Öffne die App, um hier deinen Status zu sehen</string>
+    <plurals name="widget_days_attack_free">
+        <item quantity="one">%d Tag attackenfrei</item>
+        <item quantity="other">%d Tage attackenfrei</item>
+    </plurals>
+    <plurals name="widget_days_attack_free_label">
+        <item quantity="one">Tag attackenfrei</item>
+        <item quantity="other">Tage attackenfrei</item>
+    </plurals>
+    <plurals name="widget_attacks_today">
+        <item quantity="one">%d Attacke heute</item>
+        <item quantity="other">%d Attacken heute</item>
+    </plurals>
+
+    <string name="widget_preview_label">Tage attackenfrei</string>
+
+    <string name="download_started">Wird heruntergeladen…</string>
+    <string name="download_failed">Download fehlgeschlagen. Bitte versuche es erneut.</string>
+    <string name="download_share">Teilen</string>
+</resources>
