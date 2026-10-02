@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<network-security-config xmlns:tools="http://schemas.android.com/tools">
-    <!-- Debug builds only: allow a local development server over HTTP and user-installed CAs for proxies. -->
-    <base-config
-        cleartextTrafficPermitted="true"
-        tools:ignore="InsecureBaseConfiguration">
-        <trust-anchors>
-            <certificates src="system" />
-            <certificates
-                src="user"
-                tools:ignore="AcceptsUserCertificates" />
-        </trust-anchors>
-    </base-config>
+<network-security-config>
+    <!-- Debug builds only: plain HTTP to a Rails server on the development machine, reached from the emulator
+         as 10.0.2.2 or through `adb reverse` as localhost. Everything else stays HTTPS-only. -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">10.0.2.2</domain>
+        <domain includeSubdomains="false">localhost</domain>
+    </domain-config>
 </network-security-config>
