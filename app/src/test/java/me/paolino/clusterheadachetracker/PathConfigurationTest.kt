@@ -20,7 +20,16 @@ class PathConfigurationTest {
 
     @Test
     fun logFormsAndTheCurrentAttackAreModalsWithoutPullToRefresh() {
-        listOf("/headache_logs/new", "/headache_logs/new?quick=1", "/headache_logs/12/edit", "/current_attack")
+        listOf(
+            "/headache_logs/new",
+            "/headache_logs/new?quick=1",
+            "/headache_logs/12/edit",
+            "/current_attack",
+            "/medications/new",
+            "/medications/3/edit",
+            "/medication_doses/new",
+            "/medication_doses/7/edit",
+        )
             .forEach { path ->
                 val properties = properties(path)
                 assertEquals(path, "modal", properties["context"])

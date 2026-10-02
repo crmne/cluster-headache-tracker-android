@@ -111,12 +111,21 @@ class AppButtonComponent(name: String, private val bridgeDelegate: BridgeDelegat
         val title: String,
         @SerialName("androidImage") val imageName: String? = null,
         @SerialName("color") val colorCode: String? = null,
+        val nativeAction: String? = null,
     ) {
         /**
-         * Titles get translated as the web app becomes multilingual, so the Material Symbols name
-         * (`data-bridge-android-image`) wins; English titles remain as a fallback for older pages.
+         * Titles are translated, so the language-independent `nativeAction` decides; older servers don't send it,
+         * so the Material Symbols name and then the English title are fallbacks.
          */
         val action: Action
+            get() = when (nativeAction) {
+                "print" -> Action.PRINT
+                "sign-out" -> Action.SIGN_OUT
+                "sponsor" -> Action.SPONSOR
+                else -> legacyAction
+            }
+
+        private val legacyAction: Action
             get() = when {
                 imageName == "print" || title == "Print" -> Action.PRINT
                 imageName == "logout" || title == "Sign Out" -> Action.SIGN_OUT
