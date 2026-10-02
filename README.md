@@ -11,6 +11,9 @@ The main reason for creating this Android app is to increase accessibility and v
 - 📱 Access the Cluster Headache Tracker web app through a familiar Android app interface
 - 📊 View and interact with headache logs and charts
 - 🔒 Secure authentication and data storage (handled by the web app)
+- 🏠 Home-screen widget with a live timer for an ongoing attack or your days attack-free
+- ⚡ App shortcuts to log an attack or open the current attack in one tap
+- 📄 PDF reports open in your viewer or share sheet; photos can be attached from the camera or gallery
 
 ## 🔢 Versioning
 
@@ -20,8 +23,33 @@ The main reason for creating this Android app is to increase accessibility and v
 
 ## 🛠 Requirements
 
-- Android 9 (API level 28)
-- Android Studio
+- Android 9 (API level 28) or newer on the device
+- Android Studio (its bundled JBR is the JDK the build expects)
+
+## 🔏 Release signing
+
+Release builds are signed with a release key when one is configured, otherwise with the debug key (so local and CI builds keep working).
+
+Locally, set Gradle properties (e.g. in `~/.gradle/gradle.properties`) or environment variables:
+
+```
+RELEASE_KEYSTORE_PATH=/path/to/release.keystore
+RELEASE_KEYSTORE_PASSWORD=…
+RELEASE_KEY_ALIAS=…
+RELEASE_KEY_PASSWORD=…
+```
+
+The release workflow reads these GitHub secrets: `RELEASE_KEYSTORE_BASE64` (the keystore, base64-encoded), `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD`.
+
+## 🧪 Development
+
+```bash
+export JAVA_HOME=/opt/android-studio/jbr
+./gradlew testDebugUnitTest lintDebug detekt spotlessCheck
+./gradlew connectedDebugAndroidTest   # needs an emulator or device
+```
+
+To run against a local Rails server, start it on a free port, run `adb reverse tcp:3078 tcp:3078` and install with `./gradlew installDebug -PbaseUrl=http://localhost:3078`.
 
 ## 📲 Installation
 
