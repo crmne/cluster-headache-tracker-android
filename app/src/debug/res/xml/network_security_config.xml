@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<network-security-config>
-    <!-- Allow all cleartext traffic in debug builds for local development -->
-    <base-config cleartextTrafficPermitted="true">
+<network-security-config xmlns:tools="http://schemas.android.com/tools">
+    <!-- Debug builds only: allow a local development server over HTTP and user-installed CAs for proxies. -->
+    <base-config
+        cleartextTrafficPermitted="true"
+        tools:ignore="InsecureBaseConfiguration">
         <trust-anchors>
             <certificates src="system" />
-            <certificates src="user" />
+            <certificates
+                src="user"
+                tools:ignore="AcceptsUserCertificates" />
         </trust-anchors>
     </base-config>
 </network-security-config>
