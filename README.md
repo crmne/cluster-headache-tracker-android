@@ -28,7 +28,7 @@ The main reason for creating this Android app is to increase accessibility and v
 
 ## 🔏 Release signing
 
-Release builds are signed with a release key when one is configured, otherwise with the debug key (so local and CI builds keep working).
+Release builds are signed with a release key when one is configured, otherwise with the debug key (so local and CI builds keep working). The release workflow refuses to publish without the release key: the GitHub APK and the Google Play bundle are both signed with it, so people can move between them.
 
 Locally, set Gradle properties (e.g. in `~/.gradle/gradle.properties`) or environment variables:
 
@@ -40,6 +40,10 @@ RELEASE_KEY_PASSWORD=…
 ```
 
 The release workflow reads these GitHub secrets: `RELEASE_KEYSTORE_BASE64` (the keystore, base64-encoded), `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD`.
+
+## 🛒 Google Play
+
+`fastlane/README.md` holds everything the Play Console asks for: the listing in English and German, screenshots, the Data safety and content rating answers, the health apps declaration and the review account. Tagging `vX.Y.Z` (with `packaging/release-notes/vX.Y.Z.md` committed first) builds the signed `.aab` to upload.
 
 ## 🧪 Development
 
