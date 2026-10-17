@@ -3,7 +3,6 @@ package me.paolino.clusterheadachetracker
 import android.app.Application
 import android.webkit.CookieManager
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.pm.PackageInfoCompat
 import com.google.android.material.color.DynamicColors
 import com.masilotti.bridgecomponents.shared.Bridgework
 import dev.hotwire.core.bridge.KotlinXJsonConverter
@@ -40,7 +39,7 @@ class ClusterHeadacheTrackerApplication : Application() {
         Hotwire.config.logger.logLevel = if (BuildConfig.DEBUG) HotwireLogLevel.DEBUG else HotwireLogLevel.NONE
         Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
         Hotwire.config.jsonConverter = KotlinXJsonConverter()
-        Hotwire.config.applicationUserAgentPrefix = buildUserAgentPrefix()
+        Hotwire.config.applicationUserAgentPrefix = AppUserAgent.prefix(this)
 
         Hotwire.loadPathConfiguration(
             context = this,
@@ -63,13 +62,6 @@ class ClusterHeadacheTrackerApplication : Application() {
         )
         @Suppress("SpreadOperator")
         Hotwire.registerBridgeComponents(*bridgeComponents.toTypedArray())
-    }
-
-    private fun buildUserAgentPrefix(): String {
-        val packageInfo = packageManager.getPackageInfo(packageName, 0)
-        val versionName = packageInfo.versionName
-        val versionCode = PackageInfoCompat.getLongVersionCode(packageInfo)
-        return "ClusterHeadacheTracker; platform=android; version=$versionName; build=$versionCode;"
     }
 
     companion object {
