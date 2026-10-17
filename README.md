@@ -4,7 +4,7 @@ Cluster Headache Tracker Android is a Hotwire Native wrapper for the [Cluster He
 
 ## 🎯 Purpose
 
-The main reason for creating this Android app is to increase accessibility and visibility of the Cluster Headache Tracker. While the web application functions as a Progressive Web App (PWA), many users are unfamiliar with PWAs or how to add them to their home screens. This native Android wrapper provides a familiar way for users to download and access the app through the App Store.
+The main reason for creating this Android app is to increase accessibility and visibility of the Cluster Headache Tracker. While the web application functions as a Progressive Web App (PWA), many users are unfamiliar with PWAs or how to add them to their home screens. This native Android wrapper provides a familiar way for users to download and access the app through Google Play.
 
 ## 🚀 Features
 
@@ -80,7 +80,7 @@ Cluster Headache Tracker Android is released under the [GNU General Public Licen
 
 ## 🔒 Privacy
 
-This Android app provides access to the same web application as the browser version, maintaining the same privacy principles. No additional personally identifiable information is collected or stored. All data handling occurs on the EU-based servers of the main Cluster Headache Tracker application.
+This Android app provides access to the same web application as the browser version, under the same [privacy policy](https://clusterheadachetracker.com/privacy-policy). It contains no analytics, crash reporting or tracking SDK. The attack status shown in the widget stays on the device, is left out of backups, and is removed when you sign out.
 
 ## 🍕 Support the Project
 
