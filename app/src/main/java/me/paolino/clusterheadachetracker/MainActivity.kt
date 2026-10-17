@@ -36,7 +36,7 @@ class MainActivity : HotwireActivity() {
         setContentView(R.layout.activity_main)
 
         lastSelectedRealTabIndex = savedInstanceState?.getInt(SELECTED_TAB_KEY) ?: MainTabs.DEFAULT_INDEX
-        configureBottomNavigation()
+        configureBottomNavigation(restoring = savedInstanceState != null)
 
         if (savedInstanceState == null) {
             pendingDeepLinkUrl = DeepLinks.urlFrom(intent)
@@ -104,13 +104,18 @@ class MainActivity : HotwireActivity() {
         navigator.route(url)
     }
 
-    private fun configureBottomNavigation() {
+    /**
+     * Tabs load lazily on a fresh start, so launching doesn't fetch five pages. When the activity is recreated (the
+     * system switching to dark mode, say), Hotwire Native 1.3.1 restores a lazy tab that had been opened without its
+     * navigation graph and it stays blank, so every tab loads again up front instead.
+     */
+    private fun configureBottomNavigation(restoring: Boolean) {
         bottomNavigationView = findViewById(R.id.bottom_nav)
 
         bottomNavigationController = HotwireBottomNavigationController(
             activity = this,
             view = bottomNavigationView,
-            lazyLoadTabs = true,
+            lazyLoadTabs = !restoring,
         )
         bottomNavigationController.load(tabs, lastSelectedRealTabIndex)
         bottomNavigationController.setOnTabSelectedListener(::onTabSelected)
