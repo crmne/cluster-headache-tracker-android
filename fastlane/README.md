@@ -27,11 +27,12 @@ Console by hand if you prefer.
 
 ## Signing
 
-Let Google Play sign with the key the GitHub APKs already use ("Use my own
-key" when enrolling in Play App Signing, exporting it with Google's PEPK
-tool), so people can move between the GitHub APK and Google Play without
-uninstalling. With a key Google generates, a GitHub install can't update from
-Google Play.
+The release key is the "Android Release Keystore" item in 1Password (see the
+main README). Enroll in Play App Signing with that key ("Use my own key",
+exporting it with Google's PEPK tool) rather than one Google generates, so the
+GitHub APK and Google Play builds share a signature and people can move
+between them without uninstalling. Releases up to v2.1.1 were signed with
+throwaway debug keys, so their installs must be uninstalled once either way.
 
 ## Store settings
 
@@ -48,7 +49,7 @@ Google Play.
 
 - **App access**: all functionality needs an account. Give the `appreview`
   username and its password, and add: "Usernames and passwords only, no email.
-  The account holds made-up data. Account › Delete account deletes it."
+  The account holds made-up data and has already given the health data consent new accounts tick at sign-up. Account › Delete account deletes it."
 - **Target audience**: 18 and over (the privacy policy says the service isn't
   meant for children under 16; choosing adults only keeps the Families policy
   out of it). Not designed to appeal to children.
@@ -84,7 +85,7 @@ Google Play.
 | Photos and videos › Photos | Yes | Optional | App functionality |
 | App activity › Other user-generated content | Yes (notes, feedback answers) | Optional | App functionality |
 | App activity › App interactions | Yes (page views, self-hosted Plausible, no cookies, no stored IP) | Required | Analytics |
-| App info and performance › Diagnostics | Yes (server error reports naming the account by number) | Required | App functionality |
+| App info and performance › Diagnostics | Yes (server error reports to our self-hosted Bugsink: the failed request, the account number and username; a failed save can include its health details) | Required | App functionality |
 
 Not collected: location, contacts, messages, email address, name, phone
 number, financial info, web history, device or advertising IDs, files, audio,

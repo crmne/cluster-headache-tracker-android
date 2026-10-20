@@ -41,6 +41,20 @@ RELEASE_KEY_PASSWORD=…
 
 The release workflow reads these GitHub secrets: `RELEASE_KEYSTORE_BASE64` (the keystore, base64-encoded), `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD`.
 
+The key lives in 1Password, in the "Android Release Keystore" item of the `cluster-headache-tracker` vault: `keystore_base64` (the PKCS12 keystore, base64-encoded, since `op-cache` doesn't return binary attachments intact), `password` (store and key password) and `alias`. A signed local build:
+
+```bash
+op-cache read "op://cluster-headache-tracker/Android Release Keystore/keystore_base64" | base64 -d > /tmp/release.keystore
+RELEASE_KEYSTORE_PATH=/tmp/release.keystore \
+RELEASE_KEY_ALIAS=cluster-headache-tracker \
+RELEASE_KEYSTORE_PASSWORD="op://cluster-headache-tracker/Android Release Keystore/password" \
+RELEASE_KEY_PASSWORD="op://cluster-headache-tracker/Android Release Keystore/password" \
+  op-cache run ./gradlew bundleRelease -PreleaseVersionName=X.Y.Z -PreleaseVersionCode=XYYZZ
+rm /tmp/release.keystore
+```
+
+Releases up to v2.1.1 were signed with throwaway debug keys that changed from build to build, so moving from one of those APKs to a later one, or to Google Play, takes uninstalling it first.
+
 ## 🛒 Google Play
 
 `fastlane/README.md` holds everything the Play Console asks for: the listing in English and German, screenshots, the Data safety and content rating answers, the health apps declaration and the review account. Tagging `vX.Y.Z` (with `packaging/release-notes/vX.Y.Z.md` committed first) builds the signed `.aab` to upload.
