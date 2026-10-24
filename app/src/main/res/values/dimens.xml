@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The dock: the floating toolbar (Material 3's 64dp) and New log, 16dp above the gesture bar. -->
+    <dimen name="floating_toolbar_height">64dp</dimen>
+    <dimen name="floating_tab_size">48dp</dimen>
+    <dimen name="dock_margin">16dp</dimen>
+    <dimen name="dock_gap">8dp</dimen>
+</resources>

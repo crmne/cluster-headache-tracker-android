@@ -1,7 +1,7 @@
 <resources>
     <string name="tab_logs">Diario</string>
     <string name="tab_charts">Grafici</string>
-    <string name="tab_new">Nuovo</string>
+    <string name="new_log">Nuova registrazione</string>
     <string name="tab_account">Account</string>
     <string name="tab_feedback">Feedback</string>
 
