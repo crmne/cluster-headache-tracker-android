@@ -75,10 +75,12 @@ class TabShell(
             button.contentDescription = title
             TooltipCompat.setTooltipText(button, title)
             button.setOnClickListener { onClick(tab) }
+            // Tabs hidden before the buttons existed (remembered from the last launch).
+            button.isVisible = tab !in hidden
             buttons.addView(button)
             buttonFor[tab] = button
         }
-        select(selected, animate = false)
+        select(selected.takeIf { it !in hidden } ?: tabs.first { it !in hidden }, animate = false)
     }
 
     /** Shows [tab]'s navigator, adding its host the first time. */

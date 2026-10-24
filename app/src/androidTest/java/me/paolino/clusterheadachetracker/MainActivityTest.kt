@@ -49,6 +49,9 @@ class MainActivityTest {
             scenario.onActivity { activity ->
                 assertEquals(activity.getString(R.string.tab_charts), activity.getString(activity.selectedTab.title))
             }
+            // The form opened on the Charts tab's navigator. (Instrumented tests
+            // have no session, so the sign-in form then covers it.)
+            scenario.onActivity { activity -> assertEquals(MainTabs.named("charts"), activity.newLogOpenedOn) }
         }
     }
 

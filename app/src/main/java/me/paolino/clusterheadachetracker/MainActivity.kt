@@ -53,6 +53,11 @@ class MainActivity : HotwireActivity() {
     var routedDeepLinkUrl: String? = null
         private set
 
+    /** The tab whose navigator the last New log form opened on. */
+    @VisibleForTesting
+    var newLogOpenedOn: ShellTab? = null
+        private set
+
     @VisibleForTesting
     val selectedTab: ShellTab
         get() = tabs.selected
@@ -173,8 +178,15 @@ class MainActivity : HotwireActivity() {
         updateChrome()
     }
 
-    fun checkAuthenticationCompleted(location: String) {
+    /**
+     * A visit completed in [navigator]: if the sign-in form was up and this
+     * is the current tab leaving the sign-in pages, signing in worked and
+     * every tab starts afresh. Another tab finishing a visit in the
+     * background proves nothing, and must not close the form.
+     */
+    fun checkAuthenticationCompleted(navigator: Navigator, location: String) {
         if (!isAuthenticating) return
+        if (navigator != delegate.currentNavigator) return
         if (AppRoutes.isAuthenticationLocation(location)) return
 
         isAuthenticating = false
@@ -199,7 +211,11 @@ class MainActivity : HotwireActivity() {
     private fun setUpNewLogButton() {
         val button = findViewById<FloatingActionButton>(R.id.new_log)
         TooltipCompat.setTooltipText(button, getString(R.string.new_log))
-        button.setOnClickListener { delegate.currentNavigator?.route(AppRoutes.newHeadacheLogUrl) }
+        button.setOnClickListener {
+            val navigator = delegate.currentNavigator ?: return@setOnClickListener
+            newLogOpenedOn = tabs.selected
+            navigator.route(AppRoutes.newHeadacheLogUrl)
+        }
     }
 
     /**
