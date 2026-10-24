@@ -3,7 +3,7 @@
 
     <string name="tab_logs">Logs</string>
     <string name="tab_charts">Charts</string>
-    <string name="tab_new">New</string>
+    <string name="new_log">New log</string>
     <string name="tab_account">Account</string>
     <string name="tab_feedback">Feedback</string>
 

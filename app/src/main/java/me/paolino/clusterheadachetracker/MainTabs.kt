@@ -1,60 +1,44 @@
 package me.paolino.clusterheadachetracker
 
-import android.content.Context
-import androidx.annotation.DrawableRes
-import androidx.annotation.IdRes
-import androidx.annotation.StringRes
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
-import dev.hotwire.navigation.tabs.HotwireBottomTab
+import me.paolino.clusterheadachetracker.shell.ShellTab
 
+/**
+ * The floating toolbar's tabs. Logging an attack isn't a tab: it's the
+ * floating button beside them, which opens the form over whatever tab is
+ * showing.
+ */
 object MainTabs {
-    const val LOGS_INDEX = 0
-    const val CHARTS_INDEX = 1
-    const val NEW_INDEX = 2
-    const val ACCOUNT_INDEX = 3
-    const val FEEDBACK_INDEX = 4
-    const val DEFAULT_INDEX = LOGS_INDEX
-
-    private data class Tab(
-        val name: String,
-        @StringRes val titleResId: Int,
-        @DrawableRes val iconResId: Int,
-        @IdRes val navigatorHostId: Int,
-        val startLocation: String,
-    )
+    private class Tab(val name: String, val shellTab: ShellTab, val startLocation: String)
 
     private val tabs = listOf(
-        Tab("logs", R.string.tab_logs, R.drawable.ic_tab_calendar, R.id.logs_navigator_host, AppRoutes.logsUrl),
-        Tab("charts", R.string.tab_charts, R.drawable.ic_tab_chart, R.id.charts_navigator_host, AppRoutes.chartsUrl),
-        // Action tab: never stays selected, it opens the new-log form on the current tab instead.
-        Tab("new", R.string.tab_new, R.drawable.ic_tab_add, R.id.new_navigator_host, AppRoutes.logsUrl),
+        Tab("logs", ShellTab(R.string.tab_logs, R.drawable.ic_tab_logs, R.id.logs_navigator_host), AppRoutes.logsUrl),
+        Tab(
+            "charts",
+            ShellTab(R.string.tab_charts, R.drawable.ic_tab_charts, R.id.charts_navigator_host),
+            AppRoutes.chartsUrl,
+        ),
         Tab(
             "account",
-            R.string.tab_account,
-            R.drawable.ic_tab_person,
-            R.id.account_navigator_host,
+            ShellTab(R.string.tab_account, R.drawable.ic_tab_account, R.id.account_navigator_host),
             AppRoutes.accountUrl,
         ),
         Tab(
             "feedback",
-            R.string.tab_feedback,
-            R.drawable.ic_tab_message,
-            R.id.feedback_navigator_host,
+            ShellTab(R.string.tab_feedback, R.drawable.ic_tab_feedback, R.id.feedback_navigator_host),
             AppRoutes.feedbackUrl,
         ),
     )
 
-    fun all(context: Context): List<HotwireBottomTab> = tabs.map { tab ->
-        HotwireBottomTab(
-            title = context.getString(tab.titleResId),
-            iconResId = tab.iconResId,
-            configuration = NavigatorConfiguration(
-                name = tab.name,
-                navigatorHostId = tab.navigatorHostId,
-                startLocation = tab.startLocation,
-            ),
-        )
+    val shellTabs: List<ShellTab> = tabs.map { it.shellTab }
+
+    val logs: ShellTab = shellTabs.first()
+
+    val navigatorConfigurations: List<NavigatorConfiguration> = tabs.map {
+        NavigatorConfiguration(name = it.name, navigatorHostId = it.shellTab.hostId, startLocation = it.startLocation)
     }
 
-    fun isActionTab(index: Int): Boolean = index == NEW_INDEX
+    fun named(name: String?): ShellTab? = tabs.firstOrNull { it.name == name }?.shellTab
+
+    fun nameOf(tab: ShellTab): String = tabs.first { it.shellTab === tab }.name
 }

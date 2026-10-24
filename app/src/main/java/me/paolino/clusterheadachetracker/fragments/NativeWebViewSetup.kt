@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import dev.hotwire.core.turbo.errors.HttpError
 import dev.hotwire.core.turbo.errors.VisitError
 import dev.hotwire.core.turbo.webview.HotwireWebView
+import dev.hotwire.navigation.fragments.HotwireWebFragment
 import me.paolino.clusterheadachetracker.MainActivity
 import me.paolino.clusterheadachetracker.downloads.FileDownloads
 
@@ -14,8 +15,8 @@ internal fun Fragment.attachDownloadListener(webView: HotwireWebView) {
     }
 }
 
-internal fun Fragment.onVisitCompletedForAuthentication(location: String) {
-    (activity as? MainActivity)?.checkAuthenticationCompleted(location)
+internal fun HotwireWebFragment.onVisitCompletedForAuthentication(location: String) {
+    (activity as? MainActivity)?.checkAuthenticationCompleted(navigator, location)
 }
 
 /** Returns true when the error was handled by presenting sign-in. */

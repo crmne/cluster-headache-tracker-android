@@ -4,7 +4,7 @@
 
 Rebuild the Android shell around the current Hotwire Native stack and Joe Masilotti's Bridge Components libraries while preserving the existing product contract:
 
-- Bottom tab bar with `Logs`, `Charts`, centered `New`, `Account`, and `Feedback`
+- Material 3's floating toolbar with `Logs`, `Charts`, `Account`, and `Feedback`, and `New log` as the floating action button beside it (it was a bottom tab bar with a centered `New` tab until October 2026)
 - Modal authentication
 - Shell-wide reset after authentication changes
 - Native bridge support from Joe's public and PRO libraries
@@ -72,15 +72,16 @@ Both fragments should share the same auth detection rules through a small helper
 
 ### Tabs
 
-The tab model remains:
+The tabs:
 
 1. `Logs` -> `/headache_logs`
 2. `Charts` -> `/charts`
-3. `New` -> action tab, not a persistent destination
-4. `Account` -> `/settings`
-5. `Feedback` -> `/feedback`
+3. `Account` -> `/settings`
+4. `Feedback` -> `/feedback`
 
-The `New` tab still requires a hidden navigator host because `HotwireBottomNavigationController` expects a host per tab. Its configured start URL should stay non-destructive, and the activity should immediately reselect the previous real tab and route `/headache_logs/new` on the active navigator.
+They sit in Material 3's floating toolbar (`FloatingToolbarLayout`), driven by `shell/TabShell.kt` instead of `HotwireBottomNavigationController`, which only drives a `BottomNavigationView`. `TabShell` adds a tab's navigator host the first time the tab shows, so launching loads one page, and Android restores the hosts it added with the activity, so a theme change never brings a tab back blank. The same class is in Chat with Work's Android app; keep them in step.
+
+`New log` is the floating action button beside the toolbar, not a tab: it routes `/headache_logs/new` on the active navigator, so the form opens over whatever tab is showing. The toolbar and the button hide on pushed pages, in modals, and under the keyboard; on a tab's first page the page scrolls under them, and the server leaves room under its last row.
 
 ### Modal Routing
 
@@ -98,8 +99,10 @@ This keeps all tabs coherent and avoids per-tab refresh bookkeeping.
 
 On authentication failure or logout, the shell should:
 
-1. Reset the shell to clear stale navigation state
-2. Present the sign-in modal on the active navigator
+1. Reset the shell to clear stale navigation state (logout resets the navigators in place on `Logs`; recreating the activity would leave every tab's web view behind, since Hotwire Native never destroys one)
+2. Present the sign-in modal on the active navigator, once: not until a tab can show it (a 401 that arrives while the tabs load waits for one), never on top of a sign-in form that's already showing or on its way (several tabs' 401s, or a form Android restored with the activity), and again on the next 401 if it was closed without signing in
+
+The activity destroys its navigators' web views when it goes (`onDestroy`), so a theme change or a finished activity leaves none alive.
 
 ## Authentication Contract
 
@@ -211,8 +214,8 @@ Firebase-backed notification token support should be conditional. If no Firebase
 ## Acceptance Criteria
 
 - Project builds against the local parent Hotwire/Bridge repos
-- Bottom tabs match the current app IA and iconography
-- Center `New` tab opens the log form modally and does not remain selected
+- The floating toolbar's tabs match the app's IA, each with its outlined icon and a filled one when chosen
+- `New log` opens the log form modally over the current tab
 - 401s present sign-in modally
 - Successful sign-in resets the tab shell cleanly
 - Joe's bridge components are the default native bridge layer

@@ -36,6 +36,53 @@
 
     <style name="Theme.ClusterHeadacheTracker" parent="Base.Theme.ClusterHeadacheTracker" />
 
+    <!--
+      The floating toolbar (Material 3's, TabShell) with the tabs as icons,
+      the chosen one with its label on a tonal pill, and New log beside it.
+    -->
+    <style name="Widget.ClusterHeadacheTracker.FloatingToolbar" parent="Widget.Material3.FloatingToolbar">
+        <!-- The dock keeps clear of the system bars itself, for New log too. -->
+        <item name="marginLeftSystemWindowInsets">false</item>
+        <item name="marginRightSystemWindowInsets">false</item>
+        <item name="marginBottomSystemWindowInsets">false</item>
+    </style>
+
+    <style name="Widget.ClusterHeadacheTracker.FloatingTab" parent="Widget.Material3.Button.TextButton.Icon">
+        <item name="android:minWidth">@dimen/floating_tab_size</item>
+        <item name="android:minHeight">@dimen/floating_tab_size</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:layout_marginHorizontal">2dp</item>
+        <item name="android:textAppearance">?attr/textAppearanceLabelLarge</item>
+        <item name="android:textColor">@color/floating_tab_content</item>
+        <item name="iconTint">@color/floating_tab_content</item>
+        <item name="iconSize">24dp</item>
+        <item name="iconGravity">textStart</item>
+        <item name="backgroundTint">@color/floating_tab_container</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.ClusterHeadacheTracker.Pill</item>
+    </style>
+
+    <style name="ShapeAppearance.ClusterHeadacheTracker.Pill" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <!-- New log: the primary color, as tall as the toolbar. -->
+    <style name="Widget.ClusterHeadacheTracker.NewLogButton" parent="Widget.Material3.FloatingActionButton.Primary">
+        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="tint">?attr/colorOnPrimary</item>
+        <item name="fabCustomSize">@dimen/floating_toolbar_height</item>
+        <item name="maxImageSize">28dp</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.ClusterHeadacheTracker.Fab</item>
+    </style>
+
+    <style name="ShapeAppearance.ClusterHeadacheTracker.Fab" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+    </style>
+
     <!-- Shown by the AndroidX SplashScreen API until the first frame, then swapped for the app theme. -->
     <style name="Theme.ClusterHeadacheTracker.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/splash_background</item>
