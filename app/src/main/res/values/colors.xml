@@ -28,4 +28,6 @@
     <color name="widget_on_surface">@color/brand_on_surface</color>
 
     <color name="splash_background">#2B3858</color>
+    <!-- The web app's page background (daisyUI base-200), shown by the web view before a page paints. -->
+    <color name="page_background">#F8F7FF</color>
 </resources>

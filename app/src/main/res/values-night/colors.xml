@@ -21,4 +21,5 @@
     <color name="brand_surface_container_highest">#35343A</color>
     <color name="brand_outline">#91909A</color>
     <color name="brand_outline_variant">#46464F</color>
+    <color name="page_background">#0F1322</color>
 </resources>

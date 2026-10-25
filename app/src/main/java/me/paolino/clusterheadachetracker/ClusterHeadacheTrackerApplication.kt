@@ -1,14 +1,17 @@
 package me.paolino.clusterheadachetracker
 
 import android.app.Application
+import android.content.Context
 import android.webkit.CookieManager
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import com.google.android.material.color.DynamicColors
 import com.masilotti.bridgecomponents.shared.Bridgework
 import dev.hotwire.core.bridge.KotlinXJsonConverter
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.logging.HotwireLogLevel
 import dev.hotwire.core.turbo.config.PathConfiguration
+import dev.hotwire.core.turbo.webview.HotwireWebView
 import dev.hotwire.navigation.config.defaultFragmentDestination
 import dev.hotwire.navigation.config.registerBridgeComponents
 import dev.hotwire.navigation.config.registerFragmentDestinations
@@ -40,6 +43,7 @@ class ClusterHeadacheTrackerApplication : Application() {
         Hotwire.config.webViewDebuggingEnabled = BuildConfig.DEBUG
         Hotwire.config.jsonConverter = KotlinXJsonConverter()
         Hotwire.config.applicationUserAgentPrefix = AppUserAgent.prefix(this)
+        Hotwire.config.makeCustomWebView = ::makeWebView
 
         Hotwire.loadPathConfiguration(
             context = this,
@@ -62,6 +66,16 @@ class ClusterHeadacheTrackerApplication : Application() {
         )
         @Suppress("SpreadOperator")
         Hotwire.registerBridgeComponents(*bridgeComponents.toTypedArray())
+    }
+
+    /**
+     * No white flash before a page paints in dark mode: the web view starts on the page's own background. No scroll
+     * bars either, which native screens don't show.
+     */
+    private fun makeWebView(context: Context): HotwireWebView = HotwireWebView(context).apply {
+        setBackgroundColor(ContextCompat.getColor(context, R.color.page_background))
+        isVerticalScrollBarEnabled = false
+        isHorizontalScrollBarEnabled = false
     }
 
     companion object {
